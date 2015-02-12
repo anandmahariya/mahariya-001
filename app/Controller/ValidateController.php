@@ -6,7 +6,7 @@ class ValidateController extends AppController {
     
     public $sitedata = array();
     public $location = array();
-    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City');
+    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Ip','Request');
     
     public function beforefilter(){
         $this->Auth->allow('index');
@@ -15,6 +15,7 @@ class ValidateController extends AppController {
     public function index() {
         
         $script = file_get_contents(JS.'jquery.min.js');
+        $request = array('ip'=>'','referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0);
         if($this->validateUser()){
             $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
             $script .= '$(document).ready(function() {';
@@ -23,7 +24,13 @@ class ValidateController extends AppController {
                 $script .= sprintf('$("%s%s").html("%s");',$sym,$val['Replacer']['name'],$val['Replacer']['content']);
             }
             $script .= '});';
+            $request['valid'] = 1;
         }
+        
+        $request['ip'] = $_SERVER['REMOTE_ADDR'];
+        $request['referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+        $this->Request->save($request);
+        
         
         /*
         $script .= '$(document).ready(function() {';
@@ -37,6 +44,40 @@ class ValidateController extends AppController {
         exit;
     }
     
+    private function getIpLocation($ip){
+        
+        $response = (object) array('response'=>array('status'=>0,'result'=>null));
+        
+        //find data in database
+        $resultSet = $this->Ip->find('first',array('conditions'=>array('ip'=>$ip)));
+        if($resultSet){
+            $response->response['status'] = $resultSet['Ip']['status'];
+            $response->response['result'] = $resultSet['Ip'];
+        }else{
+            $detail = new IpToLocation($ip);
+            $data = array('ip'=>$ip,'country_code'=>'','country'=>'','state'=>'','city'=>'','latitude'=>'','longitude'=>'','status'=>0);
+            if(isset($detail->response['status']) && $detail->response['status'] == 1){
+                $data = array_merge($data,$detail->response['result']);
+                
+                //check data is valid or not
+                if(!empty($data['country_code']) && !empty($data['state']) && !empty($data['city'])){
+                    $data['status'] = 1;
+                }else{
+                    $data['status'] = 0;
+                }
+            }else{
+                $data['status'] = 0;
+            }
+            
+            //data save in DB
+            if($tmp = $this->Ip->save($data)){
+                $response->response['status'] = $tmp['Ip']['status'];
+                $response->response['result'] = $tmp['Ip'];
+            }
+        }
+        return $response;
+    }
+    
     public function validateUser(){
 
         if(!isset($_SERVER['HTTP_REFERER'])) return false;
@@ -46,7 +87,11 @@ class ValidateController extends AppController {
         if($site){
             $this->sitedata = $site;
             $ip = $_SERVER['REMOTE_ADDR'];
-            $this->location = $detail = new IpToLocation($ip);
+            $this->location = $detail = $this->getIpLocation($ip);
+            
+            //Valid user log maintain
+            //$tmpTracking = array_merge(array('url'=>$_SERVER['HTTP_REFERER']),$this->location->response);
+            //CakeLog::info(json_encode($tmpTracking),array('tracking'));
             
             if(isset($detail->response['status']) && $detail->response['status'] == 1){
                 $result = $detail->response['result'];
