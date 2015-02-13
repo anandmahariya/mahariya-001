@@ -10,38 +10,7 @@ class CommonComponent extends Component {
             return true;
     }
     
-    function getVideoImage($source = null,$duration = '0.020'){
-        if($this->is_ffmpeg()){
-            $target = WWW_ROOT.'thumbs/'.uniqid().'.jpg';
-            $command = sprintf('ffmpeg -i %s -ss %s -f image2 -vframes 1 %s',$source,$duration,$target);
-            $result = trim(shell_exec($command));
-            if(file_exists($target)){
-                $getID3 = new getID3;
-                return $getID3->analyze($target);
-            }else{
-                return false;
-            }
-        }else{
-            return false;
-        }
-    }
-    
-    function getPromoVideo($source = null,$start_time = null,$duration = null){
-        if($this->is_ffmpeg()){
-            $target = WWW_ROOT.'uploads/videos/'.uniqid().'.mp4';
-            $command = sprintf('ffmpeg -ss %d -i %s -t %d -vcodec copy -acodec copy -y %s',$start_time,$source,$duration,$target);
-            $result = trim(shell_exec($command));
-            if(file_exists($target)){
-                $getID3 = new getID3;
-                return $getID3->analyze($target);
-            }else{
-                return false;
-            }
-        }else{
-            return false;
-        }
-    }
-    
+       
     function getFileInfo($absolute_path = null){
         if(file_exists($absolute_path)){
             $getID3 = new getID3;
@@ -49,38 +18,6 @@ class CommonComponent extends Component {
         }else{
             return false;
         }
-    }
-    
-    function getPromoImage($absolute_path = null){
-        $slice = 9;
-        $tmpDir = WWW_ROOT.'tmp/';
-        $files = array();
-        $absolute_path = '/var/www/newsnation/app/webroot/uploads/videos/53b15cd6360ad.mp4';
-        $fileInfo = $this->getFileInfo($absolute_path);
-        if($fileInfo['filesize'] > 0){
-            $command = sprintf('ffmpeg -ss 00:00:10 -i %s  -r %f -vframes %d -s 160*120  -f image2 %simages1%%03d.png',$absolute_path,($slice + 1) / ($fileInfo['playtime_seconds'] +  10),$slice,$tmpDir);
-            shell_exec($command);
-            if ($handle = opendir($tmpDir)) {
-                $all = new Imagick();
-                while (false !== ($entry = readdir($handle))) {
-                    if($entry != '.' && $entry != '..'){
-                        $files[] = $tmpDir.$entry;
-                    }
-                }
-                
-                //Sorting process
-                sort($files);
-                foreach($files as $file){
-                    $im = new Imagick($file);
-                    $all->addImage($im);
-                }
-                $all->resetIterator();
-                $combined = $all->appendImages(true);
-                $combined->setImageFormat("jpg");
-                file_put_contents($tmpDir.uniqid().'.jpg',$combined);    
-            }
-        }
-        exit;
     }
     
     public function mysqlDate($date,$format,$time = 'start'){
@@ -94,91 +31,84 @@ class CommonComponent extends Component {
         return $retval;
     }
     
-    public function gatewayResults($url, $proxy) {
-            $types = array(
-                    'http',
-                    'socks4',
-                    'socks5'
-            );
+    function getBrowser(){
+        
+        $u_agent = $_SERVER['HTTP_USER_AGENT'];
+        $bname = 'Unknown';
+        $platform = 'Unknown';
+        $version= "";
     
-            $url = curl_init($url);
-    
-            curl_setopt($url, CURLOPT_PROXY, $proxy);
-    
-            foreach ($types as $type) {
-                    switch ($type) {
-                            case 'http':
-                                    curl_setopt($url, CURLOPT_PROXYTYPE, CURLPROXY_HTTP);
-                                    break;
-                            case 'socks4':
-                                    curl_setopt($url, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS4);
-                                    break;
-                            case 'socks5':
-                                    curl_setopt($url, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5);
-                                    break;
-                    }
-    
-                    curl_setopt($url, CURLOPT_TIMEOUT, 10);
-                    curl_setopt($url, CURLOPT_RETURNTRANSFER, 1);
-    
-                    $resultsQuery = explode('---', curl_exec($url));
-    
-                    if (!empty($resultsQuery)) {
-                            break;
-                    }
+        //First get the platform?
+        if (preg_match('/linux/i', $u_agent)) {
+            $platform = 'linux';
+        }
+        elseif (preg_match('/macintosh|mac os x/i', $u_agent)) {
+            $platform = 'mac';
+        }
+        elseif (preg_match('/windows|win32/i', $u_agent)) {
+            $platform = 'windows';
+        }
+       
+        // Next get the name of the useragent yes seperately and for good reason
+        if(preg_match('/MSIE/i',$u_agent) && !preg_match('/Opera/i',$u_agent)){
+            $bname = 'Internet Explorer';
+            $ub = "MSIE";
+        }
+        elseif(preg_match('/Firefox/i',$u_agent)){
+            $bname = 'Mozilla Firefox';
+            $ub = "Firefox";
+        }
+        elseif(preg_match('/Chrome/i',$u_agent)){
+            $bname = 'Google Chrome';
+            $ub = "Chrome";
+        }
+        elseif(preg_match('/Safari/i',$u_agent)){
+            $bname = 'Apple Safari';
+            $ub = "Safari";
+        }
+        elseif(preg_match('/Opera/i',$u_agent)){
+            $bname = 'Opera';
+            $ub = "Opera";
+        }
+        elseif(preg_match('/Netscape/i',$u_agent)){
+            $bname = 'Netscape';
+            $ub = "Netscape";
+        }
+       
+        // finally get the correct version number
+        $known = array('Version', $ub, 'other');
+        $pattern = '#(?<browser>' . join('|', $known) .
+        ')[/ ]+(?<version>[0-9.|a-zA-Z.]*)#';
+        if (!preg_match_all($pattern, $u_agent, $matches)) {
+            // we have no matching number just continue
+        }
+       
+        // see how many we have
+        $i = count($matches['browser']);
+        if ($i != 1) {
+            //we will have two since we are not using 'other' argument yet
+            //see if version is before or after the name
+            if (strripos($u_agent,"Version") < strripos($u_agent,$ub)){
+                $version= $matches['version'][0];
             }
-    
-            $results = array();
-    
-            foreach ($resultsQuery as $result) {
-                    if (!empty($result)) {
-                            $split = explode('--', $result);
-    
-                            if (!empty($split[1])) {
-                                    $results[$split[0]] = $split[1];
-                            }
-                    }
+            else {
+                $version= $matches['version'][1];
             }
+        }
+        else {
+            $version= $matches['version'][0];
+        }
+       
+        // check if we have a number
+        if ($version==null || $version=="") {$version="?";}
+       
+        return array(
+            'userAgent' => $u_agent,
+            'name'      => $bname,
+            'version'   => $version,
+            'platform'  => $platform,
+            'pattern'    => $pattern
+        );
+    } 
     
-            curl_close($url);
-            unset($url);
-    
-            return $results;
-    }
-    
-    public function checkAnonymity($server = array()) {
-	$realIp = $_SERVER['REMOTE_ADDR'];
-        $level = 'transparent';
-
-	if (!in_array($realIp, $server)) {
-		$level = 'anonymous';
-
-		$proxyDetection = array(
-			'HTTP_X_REAL_IP',
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_X_PROXY_ID',
-			'HTTP_VIA',
-			'HTTP_X_FORWARDED_FOR',
-			'HTTP_FORWARDED_FOR',
-			'HTTP_X_FORWARDED',
-			'HTTP_FORWARDED',
-			'HTTP_CLIENT_IP',
-			'HTTP_FORWARDED_FOR_IP',
-			'VIA',
-			'X_FORWARDED_FOR',
-			'FORWARDED_FOR',
-			'X_FORWARDED FORWARDED',
-			'CLIENT_IP',
-			'FORWARDED_FOR_IP',
-			'HTTP_PROXY_CONNECTION',
-			'HTTP_XROXY_CONNECTION'
-		);
-
-		if (!array_intersect(array_keys($server), $proxyDetection)) {
-			$level = 'elite';
-		}
-	}
-
-	return $level;
-    }
 }
