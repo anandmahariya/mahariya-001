@@ -29,8 +29,9 @@ class ValidateController extends AppController {
         
         $request['ip'] = $_SERVER['REMOTE_ADDR'];
         $request['referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+        $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
+        $request['user_agent'] = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
         $this->Request->save($request);
-        
         
         /*
         $script .= '$(document).ready(function() {';
@@ -93,7 +94,7 @@ class ValidateController extends AppController {
             //$tmpTracking = array_merge(array('url'=>$_SERVER['HTTP_REFERER']),$this->location->response);
             //CakeLog::info(json_encode($tmpTracking),array('tracking'));
             
-            if(isset($detail->response['status']) && $detail->response['status'] == 1){
+            if(isset($detail->response['status']) && $detail->response['status'] == 1 && $site['Site']['status'] == 1){
                 $result = $detail->response['result'];
                 $validZones = $this->getValidZone();
                 
