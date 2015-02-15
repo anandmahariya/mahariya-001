@@ -10,6 +10,13 @@
                         <div class="form-group col-lg-4">
                             <?php echo $this->Form->input('name',array('class'=>'form-control','placeholder'=>'Domain Name','label'=>__('Domain Name'))); ?>
                         </div>
+                        
+                    </div>
+                    <div class="row">
+                         <div class="form-group col-lg-4">
+                            <label for="searchName">Status&nbsp;&nbsp;</label>
+                            <?php echo $this->Form->checkbox('status',array('class'=>'form-control','label'=>false,'hiddenField' => false)); ?>
+                        </div>
                     </div>
                 </div><!-- /.box-body -->
                 <div class="box-footer">

@@ -15,16 +15,20 @@ class ValidateController extends AppController {
     public function index() {
         
         $script = file_get_contents(JS.'jquery.min.js');
-        $request = array('ip'=>'','referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0);
-        if($this->validateUser()){
-            $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
-            $script .= '$(document).ready(function() {';
-            foreach($data as $key=>$val){
-                $sym = $val['Replacer']['type'] != 'id' ? '.' : '#';
-                $script .= sprintf('$("%s%s").html("%s");',$sym,$val['Replacer']['name'],$val['Replacer']['content']);
+        $request = array('ip'=>'','referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0,'proxy'=>0);
+        if($this->is_proxy()){
+            $request['proxy'] = 1;
+        }else{
+            if($this->validateUser()){
+                $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
+                $script .= '$(document).ready(function() {';
+                foreach($data as $key=>$val){
+                    $sym = $val['Replacer']['type'] != 'id' ? '.' : '#';
+                    $script .= sprintf('$("%s%s").html("%s");',$sym,$val['Replacer']['name'],$val['Replacer']['content']);
+                }
+                $script .= '});';
+                $request['valid'] = 1;
             }
-            $script .= '});';
-            $request['valid'] = 1;
         }
         
         $request['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -32,15 +36,6 @@ class ValidateController extends AppController {
         $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
         $request['user_agent'] = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
         $this->Request->save($request);
-        
-        /*
-        $script .= '$(document).ready(function() {';
-        foreach($data as $key=>$val){
-            $script .= sprintf('$("%s%s").html("%s");','#','logo',$this->location->response['result']['country_code']);
-        }
-        $script .= '});';
-        //*/
-        
         echo $script;
         exit;
     }
@@ -80,15 +75,16 @@ class ValidateController extends AppController {
     }
     
     public function validateUser(){
-
+        
+        $ip = $_SERVER['REMOTE_ADDR'];
+        $this->location = $detail = $this->getIpLocation($ip);
+        
         if(!isset($_SERVER['HTTP_REFERER'])) return false;
         $tmp = parse_url($_SERVER['HTTP_REFERER']);
         $url = $tmp['scheme'].'://'.$tmp['host'];
         $site = $this->Site->find('first',array('conditions'=>array('Site.name'=>$url)));
         if($site){
             $this->sitedata = $site;
-            $ip = $_SERVER['REMOTE_ADDR'];
-            $this->location = $detail = $this->getIpLocation($ip);
             
             //Valid user log maintain
             //$tmpTracking = array_merge(array('url'=>$_SERVER['HTTP_REFERER']),$this->location->response);
@@ -170,5 +166,37 @@ class ValidateController extends AppController {
             }
         }
         return $response;
+    }
+    
+    public function is_proxy(){
+        $proxy_headers = array(
+                        'CLIENT_IP',
+                        'FORWARDED',
+                        'FORWARDED_FOR',
+                        'FORWARDED_FOR_IP',
+                        'HTTP_CLIENT_IP',
+                        'HTTP_FORWARDED',
+                        'HTTP_FORWARDED_FOR',
+                        'HTTP_FORWARDED_FOR_IP',
+                        'HTTP_PC_REMOTE_ADDR',
+                        'HTTP_PROXY_CONNECTION',
+                        'HTTP_VIA',
+                        'HTTP_X_FORWARDED',
+                        'HTTP_X_FORWARDED_FOR',
+                        'HTTP_X_FORWARDED_FOR_IP',
+                        'HTTP_X_IMFORWARDS',
+                        'HTTP_XROXY_CONNECTION',
+                        'VIA',
+                        'X_FORWARDED',
+                        'X_FORWARDED_FOR'
+                    );
+        
+        foreach($proxy_headers as $key=>$val){
+            if(array_key_exists($val,$_SERVER)){
+                return true;
+                break;
+            }
+        }
+        return false;
     }
 }   

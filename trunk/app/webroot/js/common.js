@@ -3,7 +3,7 @@ $(function(){
     var true_img = base_url+'img/test-pass-icon.png';
     var false_img = base_url+'img/test-fail-icon.png';
     var loader = '<img class="loading" src="'+base_url+'img/spinner.gif" />';
-    var loaderCenter = '<div class="loader">'+loader+'</div>';
+    var loaderCenter = '<div align="center">'+loader+'</div>';
     
     
 /********************************************************************************
@@ -69,13 +69,12 @@ $(function(){
     //Fillup state select on change of country 
     $('#country').on('change',function(){
 	var country = $(this).val();
-	$('#state').empty();
-	$('#city').empty();
+	$('#state').html('<option value="*">All</option>'); 
+	$('#city').html('<option value="*">All</option>'); 
 	$.ajax({
 	    url: base_url + "sites/autocomplete/state/" + country,
 	    dataType: "json",
 	    success: function(response) {
-		$('#state').append('<option value="*">All</option>');  
 		$.each(response,function(key, value){
 		    $('#state').append('<option value=' + value.code + '>' + value.name + '</option>');  
 		});
@@ -87,12 +86,11 @@ $(function(){
     $('#state').on('change',function(){
 	var country = $('#country').val();
 	var state = $(this).val();
-	$('#city').empty();
+	$('#city').html('<option value="*">All</option>'); 
 	$.ajax({
 	    url: base_url + "sites/autocomplete/city/" + country + '/' + state,
 	    dataType: "json",
 	    success: function(response) {
-		$('#city').append('<option value="*">All</option>');  
 		$.each(response,function(key, value){
 		    $('#city').append('<option value=' + value.id + '>' + value.city + '</option>');  
 		});
@@ -153,6 +151,65 @@ $(function(){
         });
         return false;
     });
+    
+    //Dashboard js
+    $('#request-chart').html(loaderCenter);
+    $('#requestIndexForm select').on('change',function(){
+	renderReqChart();
+    });
+    
+    //call first time when page load
+    if ($("body").data("title") === "Dashboard-index") {
+	renderReqChart();
+    }
+    
+    
+    function renderReqChart(){
+	var postData = $('#requestIndexForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/request',
+	    data: postData, 
+	    success: function(response){
+		var data = $.parseJSON(response);
+		$('#request-chart').html('');
+		var line = new Morris.Line({
+			    element: 'request-chart',
+			    resize: true,
+			    data:  data.data,
+			    xkey: 'y',
+			    ykeys: ['valid', 'invalid','total'],
+			    labels: ['Valid','In-valid','Total'],
+			    lineColors: data.color,
+			    xLabelAngle : 35,
+			    parseTime : false,
+			    hideHover: 'auto'
+			});
+	    }
+        });
+    }
+    
+    
+    /************************** Dashboard search ***********************/
+    //Datepicker script video index page
+    $('#searchStartdate').datepicker({
+        numberOfMonths: 1,
+	changeMonth: true,
+	changeYear: true,
+        dateFormat: 'dd/mm/yy',
+        onSelect: function(selected) {
+            $("#searchEnddate").datepicker("option", "minDate", selected)
+        }
+    });
+    
+    $('#searchEnddate').datepicker({
+        numberOfMonths: 1,
+	changeMonth: true,
+	changeYear: true,
+        dateFormat: 'dd/mm/yy'
+    });
+    $("#searchEnddate").datepicker("option", "minDate", $('#searchStartdate').val());
+    
     
 });
 
