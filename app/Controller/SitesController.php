@@ -11,9 +11,18 @@ class SitesController extends AppController {
     
     public function index() {
         $condition = $paginate = array();
+        
+        if(isset($_GET['s'])){
+            $this->request->data['search'] = _decode($_GET['s']);
+        }
+        
         if($this->request->data){
-            if($this->request->data['search']['name'] != ''){
+            if(isset($this->request->data['search']['name']) && $this->request->data['search']['name'] != ''){
                 $condition['Site.name like'] = '%'.$this->request->data['search']['name'].'%';
+            }
+            
+            if(isset($this->request->data['search']['status'])){
+                $condition['Site.status'] = $this->request->data['search']['status'];
             }
         }
         

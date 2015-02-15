@@ -109,6 +109,5 @@ class CommonComponent extends Component {
             'platform'  => $platform,
             'pattern'    => $pattern
         );
-    } 
-    
+    }
 }

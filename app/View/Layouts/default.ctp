@@ -16,7 +16,10 @@
         <link href="<?php echo Router::url('/', true); ?>css/font-awesome.min.css" rel="stylesheet" type="text/css" />
         <!-- Ionicons -->
         <link href="<?php echo Router::url('/', true); ?>css/ionicons.min.css" rel="stylesheet" type="text/css" />
-        <!-- Theme style -->
+        <!-- Morris -->
+        <link href="<?php echo Router::url('/', true); ?>css/morris/morris.css" rel="stylesheet" type="text/css" />
+        
+	<!-- Theme style -->
         <link href="<?php echo Router::url('/', true); ?>css/AdminLTE.css" rel="stylesheet" type="text/css" />
 	
 	<link href="<?php echo Router::url('/', true); ?>css/jvectormap/jquery-jvectormap-1.2.2.css" rel="stylesheet" type="text/css" />
@@ -35,7 +38,7 @@
 	<!-- jQuery 2.0.2 -->
         <script src="<?php echo Router::url('/', true); ?>js/jquery.min.js"></script>
     </head>
-    <body class="skin-blue fixed">
+    <body class="skin-blue fixed" data-title="<?php echo $this->name.'-'.$this->action?>">
 	<?php echo $this->element('header'); ?>
 	<div class="wrapper row-offcanvas row-offcanvas-left">
             <!-- Left side column. contains the logo and sidebar -->
@@ -97,6 +100,9 @@
         <script src="<?php echo Router::url('/', true); ?>js/AdminLTE/app.js" type="text/javascript"></script>
 	<!-- bootbox script -->
 	<script src="<?php echo Router::url('/', true); ?>js/bootbox.min.js" type="text/javascript"></script>
+	<!-- bootbox script -->
+	<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+	<script src="<?php echo Router::url('/', true); ?>js/plugins/morris/morris.min.js" type="text/javascript"></script>
 	<!-- common script -->
 	<script src="<?php echo Router::url('/', true); ?>js/common.js" type="text/javascript"></script>
     </body>
