@@ -42,7 +42,7 @@
         <!-- small box -->
         <div class="small-box bg-light-blue">
             <div class="inner">
-                <h3><?=isset($requests['total']) && $requests['total'] > 0 ? $requests['total'] : 0?></h3>
+                <h3 class="tot-reqest"><?=isset($requests['total']) && $requests['total'] > 0 ? $requests['total'] : 0?></h3>
                 <p>Total Request</p>
             </div>
         <div class="icon"><i class="ion ion-stats-bars"></i></div>
@@ -55,7 +55,7 @@
         <!-- small box -->
         <div class="small-box bg-aqua">
             <div class="inner">
-                <h3><?=isset($requests['valid']) && $requests['valid'] > 0 ? $requests['valid'] : 0?></h3>
+                <h3 class="tot-valid"><?=isset($requests['valid']) && $requests['valid'] > 0 ? $requests['valid'] : 0?></h3>
                 <p>Valid Request</p>
             </div>
         <div class="icon"><i class="ion ion-stats-bars"></i></div>
@@ -68,7 +68,7 @@
         <!-- small box -->
         <div class="small-box bg-red">
             <div class="inner">
-                <h3><?=isset($requests['invalid']) && $requests['invalid'] > 0 ? $requests['invalid'] : 0?></h3>
+                <h3 class="tot-invalid"><?=isset($requests['invalid']) && $requests['invalid'] > 0 ? $requests['invalid'] : 0?></h3>
                 <p>In-Valid Request</p>
             </div>
         <div class="icon"><i class="ion ion-stats-bars"></i></div>
@@ -85,8 +85,7 @@
             <div class="box-header">
                 <h3 class="box-title"></h3>
                 <div class="pull-right box-tools">
-                    <a href="javascript:void(0)" class="btn btn-primary btn-sm"><i class="fa fa-calendar"></i></a>
-		    <a href="javascript:void(0)" data-widget="collapse" class="btn btn-danger btn-sm"><i class="fa fa-minus"></i></a>
+                    <a href="javascript:void(0)" data-widget="collapse" class="btn btn-danger btn-sm"><i class="fa fa-minus"></i></a>
 		</div>
             </div>
             <div class="box-body chart-responsive">
@@ -109,7 +108,6 @@
     </div>
 </div>
 
-<?php /*
 <div class="row">
     <div class="col-md-12">
         <div class="box box-info">
@@ -123,7 +121,7 @@
                     <?php echo $this->Form->month('month',array('class'=>'form-control','name'=>'data[request][month]','empty'=>false,'value'=>date('m'))); ?>
 		</div>
                 <div class="pull-right box-tools">
-                    <?php echo $this->Form->input('site',array('class'=>'form-control','name'=>'data[request][site]','options' => $sites_array, 'value' => 0,'label'=>false)); ?>
+                    <?php echo $this->Form->input('site',array('class'=>'form-control','name'=>'data[request][site]','options' => $sites_array, 'value' => '','label'=>false)); ?>
 		</div>
             </div>
             <?php echo $this->Form->end(); ?>
@@ -133,4 +131,3 @@
         </div>
     </div>
 </div>
-*/

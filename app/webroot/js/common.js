@@ -166,14 +166,33 @@ $(function(){
 	
 	$('#topip-chart').html(loaderCenter);
 	renderTopIp();
+	
+	renderClickData();
+	
+	setInterval(function(){
+	    renderReqChart();
+	    renderTopIp();
+	    renderClickData();
+	}, 20000);
+    }
+    
+    function renderClickData(){
+	$.ajax({
+	    type: "GET",
+	    url: base_url + 'dashboard/renderchart/clickdata',
+	    success: function(response) {
+		var data = $.parseJSON(response);
+		$('.tot-reqest').html(data.total);
+		$('.tot-valid').html(data.valid);
+		$('.tot-invalid').html(data.invalid);
+	    }
+	});
     }
     
     function renderTopIp(){
-	var postData = $('#requestIndexForm').serialize();
 	$.ajax({
-	    type: "POST",
+	    type: "GET",
 	    url: base_url + 'dashboard/renderchart/topip',
-	    data: postData,
 	    success: function(response) {
 		var data = $.parseJSON(response);
 		$('#topip-chart').html('');

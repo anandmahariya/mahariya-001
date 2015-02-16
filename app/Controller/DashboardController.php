@@ -20,15 +20,6 @@ class DashboardController extends AppController {
         }
         $this->set('sites',$sites);
         
-        //Total request valid and Invalid
-        $query = sprintf('SELECT SUM(1) as `total`,SUM(if(requests.valid = 1,1,0)) as `valid`,SUM(if(requests.valid = 0,1,0)) as `invalid` FROM `requests` ');
-        $tmp = $this->Request->query($query);
-        $requests = array('total'=>0,'valid'=>0,'invalid'=>0);
-        if(isset($tmp[0][0])){
-            $requests = array_merge($requests,$tmp[0][0]);
-        }
-        $this->set('requests',$requests);
-        
         $sites = array_merge(array(''=>'All','0'=>'Direct'),$this->Site->find('list'));
         $this->set('sites_array',$sites);
         
@@ -72,12 +63,21 @@ class DashboardController extends AppController {
                     }
                 break;
             case 'topip' :
-                    $query = sprintf('SELECT r.ip,SUM(1) as `tot` FROM `requests` r where r.site_id = %d AND r.created between "%s 00:00:00" AND "%s 23:59:59"  group by r.ip order by `tot` desc limit 0,10',0,'2015-02-13','2015-02-13');
+                    $query = sprintf('SELECT r.ip,SUM(1) as `tot` FROM `requests` r where r.created between "%s 00:00:00" AND "%s 23:59:59"  group by r.ip order by `tot` desc limit 0,10',date('Y-m-d'),date('Y-m-d'));
                     $dataset = $this->Request->query($query);
                     $result['color'] = $this->Common->randColor(count($dataset));
                     foreach($dataset as $key=>$val){
                         $result['data'][] = array('label'=>$val['r']['ip'],'value'=>$val['0']['tot']);   
                     }
+                break;
+            case 'clickdata' :
+                    $query = sprintf('SELECT SUM(1) as `total`,SUM(if(requests.valid = 1,1,0)) as `valid`,SUM(if(requests.valid = 0,1,0)) as `invalid` FROM `requests` ');
+                    $tmp = $this->Request->query($query);
+                    $requests = array('total'=>0,'valid'=>0,'invalid'=>0);
+                    if(isset($tmp[0][0])){
+                        $requests = array_merge($requests,$tmp[0][0]);
+                    }
+                    $result = $requests;
                 break;
         }
         echo json_encode($result);
@@ -154,6 +154,7 @@ class DashboardController extends AppController {
         
         $paginate['fields'] = array('Request.ip',
                                     'if(s.name is null,"Direct",s.name) as site',
+                                    'Request.referer',
                                     'SUM(1) as hits',
                                     'Request.valid',
                                     'Request.proxy',
