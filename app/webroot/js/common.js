@@ -153,16 +153,40 @@ $(function(){
     });
     
     //Dashboard js
-    $('#request-chart').html(loaderCenter);
-    $('#requestIndexForm select').on('change',function(){
-	renderReqChart();
-    });
+    
+    
     
     //call first time when page load
     if ($("body").data("title") === "Dashboard-index") {
+	$('#request-chart').html(loaderCenter);
+	$('#requestIndexForm select').on('change',function(){
+	    renderReqChart();
+	});
 	renderReqChart();
+	
+	$('#topip-chart').html(loaderCenter);
+	renderTopIp();
     }
     
+    function renderTopIp(){
+	var postData = $('#requestIndexForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/topip',
+	    data: postData,
+	    success: function(response) {
+		var data = $.parseJSON(response);
+		$('#topip-chart').html('');
+		var donut = new Morris.Donut({
+		    element: 'topip-chart',
+		    resize: true,
+		    colors: data.color,
+		    data: data.data,
+		    hideHover: 'auto'
+		});
+	    }
+	});
+    }
     
     function renderReqChart(){
 	var postData = $('#requestIndexForm').serialize();

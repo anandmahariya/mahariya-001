@@ -78,6 +78,38 @@
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="box box-info">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+                <div class="pull-right box-tools">
+                    <a href="javascript:void(0)" class="btn btn-primary btn-sm"><i class="fa fa-calendar"></i></a>
+		    <a href="javascript:void(0)" data-widget="collapse" class="btn btn-danger btn-sm"><i class="fa fa-minus"></i></a>
+		</div>
+            </div>
+            <div class="box-body chart-responsive">
+                <div class="chart" id="topip-chart" style="height:250px;"></div>
+            </div><!-- /.box-body -->
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="box box-info">
+            <div class="box-header">
+                <h3 class="box-title"></h3>
+                <div class="pull-right box-tools">
+		    <a href="javascript:void(0)" data-widget="collapse" class="btn btn-danger btn-sm"><i class="fa fa-minus"></i></a>
+		</div>
+            </div>
+            <div class="box-body chart-responsive">
+                <div class="chart" id="topip-chart" style="height:250px;"></div>
+            </div><!-- /.box-body -->
+        </div>
+    </div>
+</div>
+
+<?php /*
 <div class="row">
     <div class="col-md-12">
         <div class="box box-info">
@@ -101,3 +133,4 @@
         </div>
     </div>
 </div>
+*/

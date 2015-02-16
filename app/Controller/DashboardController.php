@@ -71,6 +71,14 @@ class DashboardController extends AppController {
                         $result['data'][] = array('y'=>$key,'valid'=>$val['valid'],'invalid'=>$val['invalid'],'total'=>$val['valid'] + $val['invalid']);
                     }
                 break;
+            case 'topip' :
+                    $query = sprintf('SELECT r.ip,SUM(1) as `tot` FROM `requests` r where r.site_id = %d AND r.created between "%s 00:00:00" AND "%s 23:59:59"  group by r.ip order by `tot` desc limit 0,10',0,'2015-02-13','2015-02-13');
+                    $dataset = $this->Request->query($query);
+                    $result['color'] = $this->Common->randColor(count($dataset));
+                    foreach($dataset as $key=>$val){
+                        $result['data'][] = array('label'=>$val['r']['ip'],'value'=>$val['0']['tot']);   
+                    }
+                break;
         }
         echo json_encode($result);
         exit;

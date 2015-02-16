@@ -9,7 +9,19 @@ class CommonComponent extends Component {
         else
             return true;
     }
-    
+    function randColor( $numColors ) {
+        $chars = "ABCDEF0123456789";   
+        $size = strlen( $chars );
+        $str = array();
+        for( $i = 0; $i < $numColors; $i++ ) {
+            $tmp = '#';
+            for( $j = 0; $j < 6; $j++ ) {
+                $tmp .= $chars[ rand( 0, $size - 1 ) ];
+            }
+            $str[$i] = $tmp;
+        }
+        return $str;
+    }
        
     function getFileInfo($absolute_path = null){
         if(file_exists($absolute_path)){
