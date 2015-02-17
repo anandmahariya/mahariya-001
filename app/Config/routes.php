@@ -27,6 +27,7 @@
 	//Router::connect('/', array('controller' => 'pages', 'action' => 'display', 'home'));
         Router::connect('/', array('controller' => 'dashboard', 'action' => 'index'));
         Router::connect('/jquery/*', array('controller' => 'validate', 'action' => 'index'));
+        Router::connect('/error/*', array('controller' => 'pages', 'action' => 'display', 'error'));
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */
