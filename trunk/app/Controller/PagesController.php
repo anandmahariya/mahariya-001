@@ -46,7 +46,13 @@ class PagesController extends AppController {
  */
 	public function display() {
 		$path = func_get_args();
-
+		
+		switch($path[0]){
+			case 'error' :
+				$this->layout = 'error';
+				break;
+		}
+			
 		$count = count($path);
 		if (!$count) {
 			return $this->redirect('/');
