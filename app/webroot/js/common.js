@@ -168,12 +168,32 @@ $(function(){
 	renderTopIp();
 	
 	renderClickData();
+	renderStateChart();
 	
 	setInterval(function(){
 	    renderReqChart();
 	    renderTopIp();
 	    renderClickData();
+	    renderStateChart();
 	}, 20000);
+    }
+    
+    function renderStateChart(){
+	$.ajax({
+	    type: "GET",
+	    url: base_url + 'dashboard/renderchart/statechart',
+	    success: function(response) {
+		var data = $.parseJSON(response);
+		$('#state-chart').html('');
+		var donut = new Morris.Donut({
+		    element: 'state-chart',
+		    resize: true,
+		    colors: data.color,
+		    data: data.data,
+		    hideHover: 'auto'
+		});
+	    }
+	});
     }
     
     function renderClickData(){
