@@ -67,6 +67,7 @@
                             <th><?php echo $this->Paginator->sort('city','City'); ?></th>
                             <th><?php echo $this->Paginator->sort('site','Site'); ?></th>
                             <th>Referer</th>
+                            <th>Site Referer</th>
                             <th>Proxy</th>
                             <th><?php echo $this->Paginator->sort('valid'); ?></th>
                             <th><?php echo $this->Paginator->sort('created','Request Time'); ?></th>
@@ -75,7 +76,12 @@
                             $true = $this->Html->image('test-pass-icon.png',array('alt'=>'Active'));
                             $false = $this->Html->image('test-fail-icon.png',array('alt'=>'De-active'));
                         ?>
-                        <?php foreach($data as $key=>$val) { //echo '<pre>';print_r($val);echo '</pre>';?>
+                        <?php
+                            foreach($data as $key=>$val) {
+                                $referer = $val['Request']['referer'];
+                                $tmp = parse_url($val['Request']['site_referer']);
+                                $sReferer = isset($tmp['host']) ? $tmp['host'] : 'direct';
+                        ?>
                         <tr>
                             <td><?php echo $val['Request']['ip'] ?></td>
                             <td><?php echo $val['ip']['country'] ?></td>
@@ -83,6 +89,7 @@
                             <td><?php echo $val['ip']['city'] ?></td>
                             <td><?php echo $val['0']['site'] ?></td>
                             <td><a href="javascript:void(0)" title="<?php echo $val['Request']['referer'] ?>"><?php echo $val['Request']['referer']; ?></a></td>
+                            <td><a href="javascript:void(0)" title="<?php echo $val['Request']['site_referer'] ?>"><?php echo $sReferer; ?></a></td>
                             <td><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></td>
                             <td><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></td>
                             <td><?php echo date('d M Y h:i:s A',strtotime($val['Request']['created'])) ?></td>
