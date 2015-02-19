@@ -33,6 +33,7 @@ class ValidateController extends AppController {
         
         $request['ip'] = $_SERVER['REMOTE_ADDR'];
         $request['referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+        $request['site_referer'] = isset($_GET['v']) ? base64_decode($_GET['v']) : 'direct';
         $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
         $request['user_agent'] = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
         $this->Request->save($request);
@@ -79,16 +80,21 @@ class ValidateController extends AppController {
         $ip = $_SERVER['REMOTE_ADDR'];
         $this->location = $detail = $this->getIpLocation($ip);
         
+        // Referer means if any one user comes from another source because 
         if(!isset($_SERVER['HTTP_REFERER'])) return false;
+        
         $tmp = parse_url($_SERVER['HTTP_REFERER']);
         $url = $tmp['scheme'].'://'.$tmp['host'];
         $site = $this->Site->find('first',array('conditions'=>array('Site.name'=>$url)));
         if($site){
             $this->sitedata = $site;
             
-            //Valid user log maintain
-            //$tmpTracking = array_merge(array('url'=>$_SERVER['HTTP_REFERER']),$this->location->response);
-            //CakeLog::info(json_encode($tmpTracking),array('tracking'));
+            //block which user who visit the site more than one time
+            $query = sprintf('select r.ip,sum(1) as tot from requests r where r.ip = "%s" and created between "%s 00:00:00" and "%s 23:59:59" ',$ip,date('Y-m-d'),date('Y-m-d'));
+            $dataset = $this->Request->query($query);
+            if(isset($dataset[0][0]['tot']) && $dataset[0][0]['tot'] >= Configure::read('max_click')){
+                return false;
+            }
             
             if(isset($detail->response['status']) && $detail->response['status'] == 1 && $site['Site']['status'] == 1){
                 $result = $detail->response['result'];

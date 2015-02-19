@@ -79,6 +79,21 @@ class DashboardController extends AppController {
                     }
                     $result = $requests;
                 break;
+            case 'statechart' :
+                $query = sprintf('SELECT i.state,sum(1) as tot FROM `requests` r
+                                 left join ips i on i.ip = r.ip
+                                 where
+                                 i.country_code = "US"
+                                 AND i.state != ""
+                                 AND r.created between "%s 00:00:00" AND "%s 23:59:59"
+                                 group by i.state order by tot desc',date('Y-m-d'),date('Y-m-d'));
+                
+                $dataset = $this->Request->query($query);
+                $result['color'] = $this->Common->randColor(count($dataset));
+                foreach($dataset as $key=>$val){
+                    $result['data'][] = array('label'=>ucwords($val['i']['state']),'value'=>$val['0']['tot']);   
+                }
+                break;
         }
         echo json_encode($result);
         exit;
@@ -155,6 +170,7 @@ class DashboardController extends AppController {
         $paginate['fields'] = array('Request.ip',
                                     'if(s.name is null,"Direct",s.name) as site',
                                     'Request.referer',
+                                    'Request.site_referer',
                                     'SUM(1) as hits',
                                     'Request.valid',
                                     'Request.proxy',

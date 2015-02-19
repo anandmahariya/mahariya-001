@@ -102,7 +102,7 @@
 		</div>
             </div>
             <div class="box-body chart-responsive">
-                <div class="chart" id="topip-chart" style="height:250px;"></div>
+                <div class="chart" id="state-chart" style="height:250px;"></div>
             </div><!-- /.box-body -->
         </div>
     </div>
