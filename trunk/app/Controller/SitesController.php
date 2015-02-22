@@ -127,7 +127,8 @@ class SitesController extends AppController {
                 }
             }
         }
-        $this->set('type',array('id'=>'Id','class'=>'Class'));
+        $this->set('type',array('id'=>'Id','class'=>'Class','script'=>'Script'));
+        $this->set('script_type',array('redirect'=>'Redirect'));
         
     }
     

@@ -51,6 +51,34 @@ $(function(){
             }
         }
     });
+    
+    $('#ReplacerReplaceroprForm #ReplacerType').on('change',function(){
+	replacerfieldsarrange();
+    });
+    
+    function replacerfieldsarrange(){
+	var tmp = $('#ReplacerReplaceroprForm #ReplacerType').val();
+	switch (tmp){
+	    case 'script' :
+		$('.replacer_name').hide();
+		$('.script_type').show();
+		$('#ReplacerName').val($('#ReplacerScriptType').val());
+		switch($('#ReplacerScriptType').val()){
+		    case 'redirect' :
+			    $('.ReplacerContent_label').html('Redirect Url');
+			break;
+		}
+		break;
+	    default :
+		$('.replacer_name').show();
+		$('.script_type').hide();
+		$('.ReplacerContent_label').html('Container Value');
+		break;
+	}
+    }
+    
+    replacerfieldsarrange();
+    
    
     //Form Restricted Zone form
     $("#RestrictedZoneRestrictedzoneoprForm").validate({
