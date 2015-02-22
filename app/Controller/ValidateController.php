@@ -23,8 +23,21 @@ class ValidateController extends AppController {
                 $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
                 $script .= '$(document).ready(function() {';
                 foreach($data as $key=>$val){
-                    $sym = $val['Replacer']['type'] != 'id' ? '.' : '#';
-                    $script .= sprintf('$("%s%s").html("%s");',$sym,$val['Replacer']['name'],$val['Replacer']['content']);
+                    switch($val['Replacer']['type']){
+                        case 'id' :
+                            $script .= sprintf('$("#%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                            break;
+                        case 'class' :
+                            $script .= sprintf('$(".%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                            break;
+                        case 'script' :
+                            switch($val['Replacer']['name']){
+                                case 'redirect' :
+                                    $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
+                                    break;
+                            }
+                            break;
+                    }
                 }
                 $script .= '});';
                 $request['valid'] = 1;

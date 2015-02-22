@@ -1,10 +1,11 @@
+<?php $edit = isset($this->data['Replacer']['id']) && $this->data['Replacer']['id'] > 0 ? true : false; ?>
 <div class="row">
     <!-- left column -->
     <div class="col-md-12">
         <!-- general form elements -->
         <div class="box box-primary">
             <div class="box-header">
-                <h3 class="box-title"><?php echo isset($this->data['Replacer']['id']) && $this->data['Replacer']['id'] != '' ? 'Edit' : 'Add'; ?>&nbsp;Replacer</h3>
+                <h3 class="box-title"><?php echo $edit === true ? 'Edit' : 'Add'; ?>&nbsp;Replacer</h3>
                 <div class="box-tools pull-right">
                     <?php echo $this->Html->link('Back',$back,array('class'=>'btn btn-default btn-sm')); ?>
                 </div>
@@ -17,17 +18,23 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="form-group col-lg-5">
-                            <?php echo $this->Form->input('type',array('options'=>$type,'empty'=>'--Select Type--','class'=>'form-control','placeholder'=>'Type','label'=>__('Container Type'))); ?>
+                            <?php echo $this->Form->input('type',array('options'=>$type,'empty'=>'--Select Type--','class'=>'form-control','placeholder'=>'Type','label'=>__('Container Type'),'disabled'=>$edit === true ? true : false)); ?>
                         </div>
                     </div>
-                    <div class="row">
+                    <div class="row script_type">
+                        <div class="form-group col-lg-5">
+                            <?php echo $this->Form->input('script_type',array('options'=>$script_type,'class'=>'form-control','placeholder'=>'Type','label'=>__('Script Type'))); ?>
+                        </div>
+                    </div>
+                    <div class="row replacer_name">
                         <div class="form-group col-lg-5">
                             <?php echo $this->Form->input('name',array('class'=>'form-control','placeholder'=>'Container Name','label'=>'Container Name')); ?>
                         </div>
                     </div>
                      <div class="row">
                         <div class="form-group col-lg-5">
-                            <?php echo $this->Form->input('content',array('class'=>'form-control','label'=>'Container Value')); ?>
+                            <label class="ReplacerContent_label">Container Value</label>
+                            <?php echo $this->Form->input('content',array('class'=>'form-control','label'=>false)); ?>
                         </div>
                     </div>
                     <div class="row">    
@@ -36,9 +43,6 @@
                             <?php echo $this->Form->checkbox('status',array('class'=>'form-control','label'=>false)); ?>
                             
                         </div>
-                    </div>
-                    <div class="row">    
-                        
                     </div>
                 </div><!-- /.box-body -->
                 <div class="box-footer">

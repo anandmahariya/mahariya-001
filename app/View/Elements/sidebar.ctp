@@ -31,5 +31,17 @@
                 </li>
             </ul>
         </li>
+        <li class="treeview <?php echo $this->name == 'Settings' ? 'active' : '' ?>">
+            <a href="#">
+                <i class="fa fa-cogs"></i>
+                <span><?php echo __('Settings') ?></span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li class="<?php echo in_array($this->action,array('getscript')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Get Script'),array('controller' => 'settings','action' => 'getscript'),array('escape'=>false)) ?>
+                </li>
+            </ul>
+        </li>
         </ul>
 </section>
