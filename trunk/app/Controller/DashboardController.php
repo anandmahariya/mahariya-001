@@ -176,6 +176,7 @@ class DashboardController extends AppController {
                                     'Request.proxy',
                                     'Request.created',
                                     'ip.country',
+                                    'ip.country_code',
                                     'ip.state',
                                     'ip.city');
         
