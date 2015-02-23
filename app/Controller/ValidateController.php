@@ -145,7 +145,7 @@ class ValidateController extends AppController {
         return false;
     }
     
-    private function getValidZone(){
+    public function getValidZone(){
         
         $response = array();
         $query = sprintf("select vz.id,c.code as country,

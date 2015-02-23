@@ -77,16 +77,35 @@
                             $false = $this->Html->image('test-fail-icon.png',array('alt'=>'De-active'));
                         ?>
                         <?php
+                        
+                            
+                            App::import('Controller', 'Validate');
+                            $tmp = new ValidateController;
+                            $validZone = $tmp->getValidZone();
+                                
                             foreach($data as $key=>$val) {
                                 $referer = $val['Request']['referer'];
                                 $tmp = parse_url($val['Request']['site_referer']);
                                 $sReferer = isset($tmp['host']) ? $tmp['host'] : 'direct';
+                                
+                                $country = $state = $city = 'text-red';
+                                if(array_key_exists($val['ip']['country_code'],$validZone)){
+                                    $country = 'text-green';
+                                    if(array_key_exists($val['ip']['state'],$validZone[$val['ip']['country_code']])){
+                                        $state = 'text-green';
+                                        if(array_key_exists('*',$validZone[$val['ip']['country_code']][$val['ip']['state']])){
+                                            $city = 'text-green';
+                                        }elseif(array_key_exists($val['ip']['city'],$validZone[$val['ip']['country_code']][$val['ip']['state']])){
+                                            $city = 'text-green';
+                                        }
+                                    }
+                                }
                         ?>
                         <tr>
                             <td><?php echo $val['Request']['ip'] ?></td>
-                            <td><?php echo $val['ip']['country'] ?></td>
-                            <td><?php echo $val['ip']['state'] ?></td>
-                            <td><?php echo $val['ip']['city'] ?></td>
+                            <td class="<?php echo $country; ?>"><?php echo $val['ip']['country'] ?></td>
+                            <td class="<?php echo $state; ?>"><?php echo $val['ip']['state'] ?></td>
+                            <td class="<?php echo $city; ?>"><?php echo $val['ip']['city'] ?></td>
                             <td><?php echo $val['0']['site'] ?></td>
                             <td><a href="javascript:void(0)" title="<?php echo $val['Request']['referer'] ?>"><?php echo $val['Request']['referer']; ?></a></td>
                             <td><a href="javascript:void(0)" title="<?php echo $val['Request']['site_referer'] ?>"><?php echo $sReferer; ?></a></td>
@@ -99,13 +118,20 @@
                 </table>
                 <?php
                     $pagination = $this->Paginator->params();
-                    $this->Paginator->options(array('update'=>'#content','evalScripts'=>true,'data'=>http_build_query($this->request->data),'method'=>'POST'));
+                    $this->Paginator->options(array('update'=>'#content',
+                                                    'before' => $this->Js->get('#spinner')->effect('fadeIn', array('buffer' => false)),
+                                                    'complete' => $this->Js->get('#spinner')->effect('fadeOut', array('buffer' => false)),
+                                                    'evalScripts'=>true,
+                                                    'data'=>http_build_query($this->request->data),
+                                                    'method'=>'POST'));
+                    
                     if($pagination['pageCount'] > 1){
                 ?>
                 <!-- Pagination start --->
                 <div class="row pull-left">
                     <div id="example2_info" class="dataTables_info"><br>
                         &nbsp;&nbsp; <?php echo $this->Paginator->counter('Showing <b>{:page}</b> - <b>{:pages}</b>, of {:count} total'); ?>
+                        &nbsp;<div id="spinner" style="display:none;float:right;"><?php echo $this->Html->image('spinner.gif');?></div>
                     </div>
                 </div>
                 <div class="row pull-right">
