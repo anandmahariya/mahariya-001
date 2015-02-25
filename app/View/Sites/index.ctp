@@ -40,7 +40,8 @@
                             <th><?php echo $this->Paginator->sort('name',__('Name')); ?></th>
                             <th><?php echo $this->Paginator->sort('status','Status'); ?></th>
                             <th width="18%">Replace Area</th>
-                            <th width="18%">&nbsp;</th>
+                            <th width="22%">&nbsp;</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -55,6 +56,7 @@
                                 $detail = _encode(array('id'=>$val['Site']['id']));
                                 $edit = _encode(array('id'=>$val['Site']['id'],'opr'=>'edit'));
                                 $delete = _encode(array('id'=>$val['Site']['id'],'opr'=>'delete'));
+                                $reset = _encode(array('id'=>$val['Site']['id'],'opr'=>'reset'));
                         ?>
                         <tr>
                             <td><?php echo $title; ?></td>
@@ -70,6 +72,8 @@
                                     echo $this->Html->link('Edit',array('controller'=>'sites','action'=>'siteopr','?'=>array('action'=>$edit)),array('class'=>'btn btn-info btn-sm')); 
                                     echo '&nbsp;';
                                     echo $this->Html->link('Delete',array('controller'=>'sites','action'=>'siteopr','?'=>array('action'=>$delete)),array('class'=>'btn btn-danger btn-sm confirm','message'=>'Are you sure to delete'));
+                                    echo '&nbsp;';
+                                    echo $this->Html->link('Reset Analytics',array('controller'=>'sites','action'=>'siteopr','?'=>array('action'=>$reset)),array('class'=>'btn btn-warning btn-sm confirm','message'=>'Are you sure to Reset Analytics'));
                                 ?>
                             </td>
                         </tr>

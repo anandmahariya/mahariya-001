@@ -1,7 +1,7 @@
 <?php
 class SitesController extends AppController {
 
-    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City');
+    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Request');
     var $helpers = array('Html');
     
     public function beforefilter(){
@@ -59,6 +59,15 @@ class SitesController extends AppController {
                     break;
                 case 'delete' :
                     if($this->Site->delete(array('id'=>$opr['id']))){
+                        $this->Session->setFlash(__('Record successfully deleted.'),'success');
+                    }else{
+                        $this->Session->setFlash(__('Record not deleted.'),'error');
+                    }
+                    $this->redirect(array('controller'=>'sites','action'=>'index'));
+                    exit;
+                    break;
+                case 'reset' :
+                    if($this->Request->delete(array('site_id'=>$opr['id']))){
                         $this->Session->setFlash(__('Record successfully deleted.'),'success');
                     }else{
                         $this->Session->setFlash(__('Record not deleted.'),'error');
