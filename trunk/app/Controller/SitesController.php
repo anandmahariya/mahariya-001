@@ -67,7 +67,7 @@ class SitesController extends AppController {
                     exit;
                     break;
                 case 'reset' :
-                    if($this->Request->delete(array('site_id'=>$opr['id']))){
+                    if($this->Request->deleteAll(array('Request.site_id'=>$opr['id']))){
                         $this->Session->setFlash(__('Record successfully deleted.'),'success');
                     }else{
                         $this->Session->setFlash(__('Record not deleted.'),'error');
