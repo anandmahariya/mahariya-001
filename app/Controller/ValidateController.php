@@ -98,7 +98,8 @@ class ValidateController extends AppController {
         
         $tmp = parse_url($_SERVER['HTTP_REFERER']);
         $url = $tmp['scheme'].'://'.$tmp['host'];
-        $site = $this->Site->find('first',array('conditions'=>array('Site.name'=>$url)));
+        $url = implode('.',array_slice(explode('.',$url),-2));
+        $site = $this->Site->find('first',array('conditions'=>array('Site.name LIKE'=>'%'.$url.'%')));
         if($site){
             $this->sitedata = $site;
             
