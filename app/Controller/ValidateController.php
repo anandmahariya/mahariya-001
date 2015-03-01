@@ -110,6 +110,25 @@ class ValidateController extends AppController {
                 return false;
             }
             
+            // Site Referer is not google.com then return false
+            $valid_sitereferer = array('google.com','google.co.in');
+            $domain = isset($_GET['v']) ? base64_decode($_GET['v']) : '';
+            if($domain !=""){
+                $domain = parse_url($domain);
+                if(isset($domain['host']) && $domain['host']!=''){
+                    $tmp = implode('.',array_slice(explode('.',$domain['host']),1));
+                    if(in_array($tmp,$valid_sitereferer)){
+                        
+                    }else{
+                        return false;
+                    }
+                }else{
+                    return false;    
+                }
+            }else{
+                return false;
+            }
+            
             if(isset($detail->response['status']) && $detail->response['status'] == 1 && $site['Site']['status'] == 1){
                 $result = $detail->response['result'];
                 $validZones = $this->getValidZone();
