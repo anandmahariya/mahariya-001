@@ -41,6 +41,9 @@
                 <li class="<?php echo in_array($this->action,array('getscript')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Get Script'),array('controller' => 'settings','action' => 'getscript'),array('escape'=>false)) ?>
                 </li>
+                <li class="<?php echo in_array($this->action,array('conditions')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Conditions'),array('controller' => 'settings','action' => 'conditions'),array('escape'=>false)) ?>
+                </li>
             </ul>
         </li>
         </ul>
