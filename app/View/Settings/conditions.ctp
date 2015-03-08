@@ -13,6 +13,9 @@
                         <div class="form-group col-lg-4">
                             <?php echo $this->Form->input('bypass_ip',array('class'=>'form-control','label'=>false)); ?>
                         </div>
+                        <div class="form-group col-lg-6">
+                            <p class="text-green">Your Ip : <b><?php echo $_SERVER['REMOTE_ADDR']; ?></b></p>
+                        </div>
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-2">

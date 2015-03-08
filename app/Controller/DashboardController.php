@@ -71,7 +71,7 @@ class DashboardController extends AppController {
                     }
                 break;
             case 'clickdata' :
-                    $query = sprintf('SELECT SUM(1) as `total`,SUM(if(requests.valid = 1,1,0)) as `valid`,SUM(if(requests.valid = 0,1,0)) as `invalid` FROM `requests` ');
+                    $query = sprintf('SELECT SUM(1) as `total`,SUM(if(r.valid = 1,1,0)) as `valid`,SUM(if(r.valid = 0,1,0)) as `invalid` FROM `requests` r where r.created between "%s 00:00:00" AND "%s 23:59:59" ',date('Y-m-d'),date('Y-m-d'));
                     $tmp = $this->Request->query($query);
                     $requests = array('total'=>0,'valid'=>0,'invalid'=>0);
                     if(isset($tmp[0][0])){
@@ -174,6 +174,8 @@ class DashboardController extends AppController {
                                     'SUM(1) as hits',
                                     'Request.valid',
                                     'Request.proxy',
+                                    'Request.proxy_comment',
+                                    'Request.valid_comment',
                                     'Request.created',
                                     'ip.country',
                                     'ip.country_code',

