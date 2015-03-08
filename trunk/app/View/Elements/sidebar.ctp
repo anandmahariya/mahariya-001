@@ -13,8 +13,20 @@
     
     <!-- sidebar menu: : style can be found in sidebar.less -->
     <ul class="sidebar-menu">
-        <li class="<?php echo $this->name == 'Dashboard' ? 'active' : '' ?>">
-            <?php echo $this->Html->link('<i class="fa fa-dashboard"></i> <span>'.__('Dashboard').'</span>',array('controller' => 'dashboard','action' => 'index'),array('escape'=>false)) ?>
+        <li class="treeview <?php echo $this->name == 'Dashboard' ? 'active' : '' ?>">
+            <a href="#">
+                <i class="fa fa-desktop"></i>
+                <span><?php echo __('Dashboard') ?></span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li class="<?php echo in_array($this->action,array('index')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Dashboard'),array('controller' => 'dashboard','action' => 'index'),array('escape'=>false)) ?>
+                </li>
+                <li class="<?php echo in_array($this->action,array('search')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Search'),array('controller' => 'dashboard','action' => 'search'),array('escape'=>false)) ?>
+                </li>
+            </ul>
         </li>
         <li class="treeview <?php echo $this->name == 'Sites' ? 'active' : '' ?>">
             <a href="#">

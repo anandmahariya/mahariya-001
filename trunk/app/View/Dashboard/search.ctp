@@ -65,8 +65,7 @@
                             <th><?php echo $this->Paginator->sort('country','Country'); ?></th>
                             <th><?php echo $this->Paginator->sort('state','State'); ?></th>
                             <th><?php echo $this->Paginator->sort('city','City'); ?></th>
-                            <th><?php echo $this->Paginator->sort('site','Site'); ?></th>
-                            <th>Referer</th>
+                            <th>Page Url</th>
                             <th>Site Referer</th>
                             <th>Proxy</th>
                             <th><?php echo $this->Paginator->sort('valid'); ?></th>
@@ -106,11 +105,10 @@
                             <td class="<?php echo $country; ?>"><?php echo $val['ip']['country'] ?></td>
                             <td class="<?php echo $state; ?>"><?php echo $val['ip']['state'] ?></td>
                             <td class="<?php echo $city; ?>"><?php echo $val['ip']['city'] ?></td>
-                            <td><?php echo $val['0']['site'] ?></td>
                             <td><a href="javascript:void(0)" title="<?php echo $val['Request']['referer'] ?>"><?php echo $val['Request']['referer']; ?></a></td>
-                            <td><a href="javascript:void(0)" title="<?php echo $val['Request']['site_referer'] ?>"><?php echo $sReferer; ?></a></td>
-                            <td><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></td>
-                            <td><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></td>
+                            <td><a href="javascript:void(0)" data-toggle="tooltip" data-original-title="<?php echo $val['Request']['site_referer']?>"><?php echo $sReferer; ?></a></td>
+                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['proxy_comment']?>" href="javascript:void(0)"><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></a></td>
+                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['valid_comment']?>" href="javascript:void(0)"><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></a></td>
                             <td><?php echo date('d M Y h:i:s A',strtotime($val['Request']['created'])) ?></td>
                         </tr>
                         <?php } ?>
