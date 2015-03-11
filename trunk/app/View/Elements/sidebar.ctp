@@ -23,6 +23,9 @@
                 <li class="<?php echo in_array($this->action,array('index')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Dashboard'),array('controller' => 'dashboard','action' => 'index'),array('escape'=>false)) ?>
                 </li>
+                <li class="<?php echo in_array($this->action,array('analytics')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Analytics'),array('controller' => 'dashboard','action' => 'analytics'),array('escape'=>false)) ?>
+                </li>
                 <li class="<?php echo in_array($this->action,array('search')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Search'),array('controller' => 'dashboard','action' => 'search'),array('escape'=>false)) ?>
                 </li>
@@ -55,6 +58,9 @@
                 </li>
                 <li class="<?php echo in_array($this->action,array('conditions')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Conditions'),array('controller' => 'settings','action' => 'conditions'),array('escape'=>false)) ?>
+                </li>
+                <li class="<?php echo in_array($this->action,array('blockip','blockipopr')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Block Ip\'s'),array('controller' => 'settings','action' => 'blockip'),array('escape'=>false)) ?>
                 </li>
             </ul>
         </li>
