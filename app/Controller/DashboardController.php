@@ -28,6 +28,77 @@ class DashboardController extends AppController {
     public function renderchart($type = null) {
         $result = array();
         switch($type){
+            case 'analytic_request' :
+                $post = $_POST['data']['analytics'];
+                $date = strtotime($this->Common->mysqlDate($post['date'],'dd/mm/yy'));
+                $fields = array();
+                for($i=0;$i<24;$i++){
+                    $fields[] = sprintf("SUM(if(requests.created between '%s' AND '%s',1,0)) as '%s' ",date('Y-m-d G:i:s',mktime($i,0,0,date('m',$date),date('d',$date),date('Y',$date))),date('Y-m-d G:i:s',mktime($i,59,59,date('m',$date),date('d',$date),date('Y',$date))),$i.':00 - '.$i.':59');
+                }
+                
+                if($post['site'] != ''){
+                    $query = sprintf('select %s,sites.name from requests left join sites on sites.id = requests.site_id where requests.site_id = %d group by requests.site_id ', implode(',',$fields),$post['site']);
+                }else{
+                    $query = sprintf('select %s,sites.name from requests left join sites on sites.id = requests.site_id group by requests.site_id  ', implode(',',$fields));
+                }
+                
+                $dataset = $this->Request->query($query);
+                
+                $tmp = array();
+                foreach($dataset as $key=>$val){
+                    $site = isset($val['sites']['name']) && $val['sites']['name']!='' ? $val['sites']['name'] : 'Direct';
+                    $tmp[$site] = $val[0];
+                }
+                
+                $result['color'] = $this->Common->randColor(count($tmp));
+                $result['labels'] = array_keys($tmp);
+                foreach($tmp as $key=>$val){
+                    foreach($val as $k=>$v){
+                        $result['data'][$k]['y'] = $k;
+                        $result['data'][$k][$key] = $v;
+                    }
+                }
+                $result['data'] = array_values($result['data']);
+                break;
+            case 'analytic_request_vip' : //valid invalid proxy
+                $post = $_POST['data']['analytics'];
+                $date_s = $this->Common->mysqlDate($post['date'],'dd/mm/yy','start');
+                $date_e = $this->Common->mysqlDate($post['date'],'dd/mm/yy','end');
+                
+                $conditions = '';
+                $sites = array();
+                if($post['site'] != ''){
+                    $conditions .= ' and r.site_id = '.$post['site'];
+                }else{
+                    $sites = array('Direct'=>array('y'=>'Direct','total'=>0,'valid'=>0,'in-valid'=>0,'proxy'=>0));
+                    $tmp = $this->Site->find('list');
+                    foreach($tmp as $key=>$val){
+                        $sites[$val] = array('y'=>$val,'total'=>0,'valid'=>0,'in-valid'=>0,'proxy'=>0);
+                    }
+                }
+                
+                
+                $query = sprintf('SELECT 
+                                    s.name,
+                                    SUM(1) as `total`,
+                                    SUM(if(r.valid = 1,1,0)) as `valid`,
+                                    SUM(if(r.valid = 0 and r.proxy = 0,1,0)) as `in-valid`,
+                                    SUM(if(r.valid = 0 and r.proxy = 1,1,0)) as `proxy`
+                                    FROM `requests` r
+                                    left join sites s on s.id = r.site_id
+                                    where r.created between "%s" and "%s" %s group by r.site_id order by r.site_id',$date_s,$date_e,$conditions);
+                
+                $dataset = $this->Request->query($query);
+                foreach($dataset as $key=>$val){
+                    $tmp = isset($val['s']['name']) && $val['s']['name']!='' ? $val['s']['name'] : 'Direct';
+                    $sites[$tmp] = $val[0];
+                    $sites[$tmp]['y'] = $tmp;
+                }
+                
+                $result['color'] = array('green','blue','red','brown');//$this->Common->randColor(count($sites));
+                $result['labels'] = array('total','valid','in-valid','proxy');
+                $result['data'] = array_values($sites);
+                break;
             case 'request' :
                     $post = $_POST['data']['request'];
                     $totalDays = date('t',mktime(0,0,0,$post['month'],1,$post['year']));
@@ -197,5 +268,10 @@ class DashboardController extends AppController {
         $sites = array_merge(array(''=>'All','0'=>'Direct'),$this->Site->find('list'));
         $this->set('sites_array',$sites);
         
+    }
+    
+    public function analytics() {
+        
+        $this->set('sites_array',$this->Site->find('list'));
     }
 }

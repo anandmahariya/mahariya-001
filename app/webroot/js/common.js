@@ -9,6 +9,36 @@ $(function(){
 /********************************************************************************
  * form validation
 ********************************************************************************/    
+    //Form Blocker IP
+     $.validator.addMethod('IP4Checker', function(value) {
+	var ip = /^(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])(\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])){3}$/;
+	    return value.match(ip);
+	}, 'Invalid IP address');
+     
+    $('#BlockipBlockipoprForm').validate({
+        rules : {
+            "data[Blockip][name]" : {
+                required: true
+            },
+	    "data[Blockip][start]" : {
+                required: true,
+		IP4Checker: true
+            },
+	    "data[Blockip][end]" : {
+                required: true,
+		IP4Checker: true
+            }
+        }
+    });
+    
+    //Form blockip search
+    $('#searchBlockipForm').validate({
+        rules : {
+            "data[search][ip]" : {
+                IP4Checker: true
+            }
+        }
+    });
     
     //Form siteopr form
     $("#SiteSiteoprForm").validate({
@@ -180,10 +210,81 @@ $(function(){
         return false;
     });
     
+    //*************************************************************************************
+    //Analytics JS
+    //Form Dashboard Analytics
+    $('#analyticsDate').datepicker({
+        numberOfMonths: 1,
+	changeMonth: true,
+	changeYear: true,
+        dateFormat: 'dd/mm/yy'
+    });
+    
+    $('#analyticsAnalyticsForm .form-control').on('change',function(){
+	renderAnalyticsCharts();
+    });
+    
+    renderAnalyticsCharts();
+    function renderAnalyticsCharts(){
+	$('#request-analytics-chart').html(loaderCenter);
+	$('#request-analytics-chart-vip').html(loaderCenter);
+	renderAnalyticsReqChart();
+	renderAnalyticsReqChart_Vip();
+    }
+    
+    function renderAnalyticsReqChart_Vip(){
+	var postData = $('#analyticsAnalyticsForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/analytic_request_vip',
+	    data: postData, 
+	    success: function(response){
+		var data = $.parseJSON(response);
+		$('#request-analytics-chart-vip').html('');
+		var line = new Morris.Line({
+			    element: 'request-analytics-chart-vip',
+			    resize: true,
+			    data:  data.data,
+			    xkey: 'y',
+			    ykeys: ['total','valid','in-valid','proxy'],
+			    labels: data.labels,
+			    lineColors: data.color,
+			    xLabelAngle : 20,
+			    parseTime : false,
+			    hideHover: 'auto'
+			});
+	    }
+        });
+    }
+    
+    
+    function renderAnalyticsReqChart(){
+	var postData = $('#analyticsAnalyticsForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/analytic_request',
+	    data: postData, 
+	    success: function(response){
+		var data = $.parseJSON(response);
+		$('#request-analytics-chart').html('');
+		var line = new Morris.Line({
+			    element: 'request-analytics-chart',
+			    resize: true,
+			    data:  data.data,
+			    xkey: 'y',
+			    ykeys: data.labels,
+			    labels: data.labels,
+			    lineColors: data.color,
+			    xLabelAngle : 35,
+			    parseTime : false,
+			    hideHover: 'auto'
+			});
+	    }
+        });
+    }
+    
+    //*************************************************************************************
     //Dashboard js
-    
-    
-    
     //call first time when page load
     if ($("body").data("title") === "Dashboard-index") {
 	$('#request-chart').html(loaderCenter);
