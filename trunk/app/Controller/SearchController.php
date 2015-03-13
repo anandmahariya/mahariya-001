@@ -23,6 +23,7 @@ class SearchController extends AppController {
      ******/
     
     public function index() {
+        //https://www.googleapis.com/customsearch/v1?key=AIzaSyDETpXCuhV0RsUtqiM5i8GB0EZ_v_bLNLs&cx=013036536707430787589:_pqjad5hr1a&q=hi&alt=json
         echo '<pre>';print_r($_GET);echo '</pre>';
         exit;
     }
