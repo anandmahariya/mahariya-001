@@ -9,7 +9,7 @@ class GetscriptController extends AppController {
     public $condition = array();
     public $proxy_comment = '';
     public $valid_comment = '';
-    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Ip','Request','Option');
+    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Ip','Request','Option','Blockip');
     
     public function beforefilter(){
         $this->Auth->allow('index');
@@ -71,6 +71,7 @@ class GetscriptController extends AppController {
             }
             
             $request['ip'] = $header['REMOTE_ADDR'];
+            $request['ip_long'] = ip2long($header['REMOTE_ADDR']);
             $request['referer'] = isset($header['SERVER_NAME']) ? $header['SERVER_NAME'].$header['REQUEST_URI'] : '';
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
             $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
@@ -94,6 +95,13 @@ class GetscriptController extends AppController {
                 $this->valid_comment .= sprintf('Bypass entry : %s',$ip);
                 return true;
             }
+        }
+        
+        //check ip in avialabel in block list
+        $blockip = $this->Blockip->find('first',array('conditions'=>array('INET_ATON("'.$ip.'") BETWEEN Blockip.start AND Blockip.end')));
+        if($blockip){
+            $this->valid_comment .= sprintf('Blocked Ip, found in : %s',$blockip['Blockip']['name']);
+            return false;
         }
         
         //check http_referer of request
@@ -211,6 +219,7 @@ class GetscriptController extends AppController {
             }
         }
         
+        /*
         if($return !== true){
             $tmp = gethostbyaddr($header['REMOTE_ADDR']);
             if($header['REMOTE_ADDR'] != $tmp){
@@ -218,6 +227,7 @@ class GetscriptController extends AppController {
                 $return = true;
             }
         }
+        */
         
         if($return !== true){
             $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
@@ -240,7 +250,7 @@ class GetscriptController extends AppController {
             $response->response['result'] = $resultSet['Ip'];
         }else{
             $detail = new IpToLocation($ip);
-            $data = array('ip'=>$ip,'country_code'=>'','country'=>'','state'=>'','city'=>'','latitude'=>'','longitude'=>'','status'=>0);
+            $data = array('ip'=>$ip,'ip_long'=>ip2long($ip),'country_code'=>'','country'=>'','state'=>'','city'=>'','latitude'=>'','longitude'=>'','status'=>0);
             if(isset($detail->response['status']) && $detail->response['status'] == 1){
                 $data = array_merge($data,$detail->response['result']);
                 
