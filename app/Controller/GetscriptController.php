@@ -44,7 +44,6 @@ class GetscriptController extends AppController {
             if($this->is_proxy($header)){
                 $request['proxy'] = 1;
             }else{
-                
                 if($this->validateUser($header)){
                     $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
                     $script .= '<script>$(document).ready(function() {';
@@ -220,10 +219,8 @@ class GetscriptController extends AppController {
         }
         
         if($return !== true){
-            $fp = fsockopen($header['REMOTE_ADDR'],80, $errno, $errstr, 5);
+            $fp = fsockopen($header['REMOTE_ADDR'].':'.$header['SERVER_PORT'],80, $errno, $errstr, 5);
             if ($fp){
-                echo '<pre>';print_r($header);echo '</pre>';
-                exit;
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
                     $this->proxy_comment .= sprintf('Request IP status code %s',$tmp);
