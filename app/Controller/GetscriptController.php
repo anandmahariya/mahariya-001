@@ -219,6 +219,11 @@ class GetscriptController extends AppController {
             }
         }
         
+        if($return !== true){
+            $fp = fsockopen($header['REMOTE_ADDR'],80, $errno, $errstr, 5);
+            if ($fp) $return = true;
+        }
+        
         /*
         if($return !== true){
             $tmp = gethostbyaddr($header['REMOTE_ADDR']);
