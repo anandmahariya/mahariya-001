@@ -219,6 +219,7 @@ class GetscriptController extends AppController {
             }
         }
         
+        /*
         if($return !== true){
             $tmp = gethostbyaddr($header['REMOTE_ADDR']);
             if($header['REMOTE_ADDR'] != $tmp){
@@ -234,6 +235,7 @@ class GetscriptController extends AppController {
                 $return = true;
             }
         }
+        */
         return $return;
     }
     
