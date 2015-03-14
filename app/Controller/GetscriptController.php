@@ -221,7 +221,13 @@ class GetscriptController extends AppController {
         
         if($return !== true){
             $fp = fsockopen($header['REMOTE_ADDR'],80, $errno, $errstr, 5);
-            if ($fp) $return = true;
+            if ($fp){
+                $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
+                if(in_array($tmp,array(200,0))){
+                    $this->proxy_comment .= sprintf('Request IP status code %s',$tmp);
+                    $return = true;
+                }
+            }
         }
         
         /*
