@@ -219,12 +219,20 @@ class GetscriptController extends AppController {
         }
         
         if($return !== true){
-            $fp = fsockopen($header['REMOTE_ADDR'].':'.$header['SERVER_PORT'],80, $errno, $errstr, 5);
+            $ip = $header['REMOTE_ADDR'].':'.$header['SERVER_PORT'];
+            $fp = fsockopen($ip,80, $errno, $errstr, 5);
             if ($fp){
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
-                    $this->proxy_comment .= sprintf('Request IP status code %s',$tmp);
+                    $this->proxy_comment .= sprintf('Request %s status code : %s',$ip,$tmp);
                     $return = true;
+                }
+            }else{
+                switch($errno){
+                    case 111 :
+                        $this->proxy_comment .= sprintf('Connection Refused from %s ',$ip);
+                        $return = true;
+                        break;
                 }
             }
         }
