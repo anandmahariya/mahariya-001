@@ -223,6 +223,7 @@ class GetscriptController extends AppController {
             $fp = fsockopen($header['REMOTE_ADDR'],80, $errno, $errstr, 5);
             if ($fp){
                 echo '<pre>';print_r($header);echo '</pre>';
+                exit;
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
                     $this->proxy_comment .= sprintf('Request IP status code %s',$tmp);
