@@ -22,7 +22,6 @@ class GetscriptController extends AppController {
     }
     
     public function index() {
-        
         if(isset($_POST['h'])){
             
             $script = '<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>';
@@ -48,30 +47,33 @@ class GetscriptController extends AppController {
             }else{
                 if($this->validateUser($header)){
                     $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
-                    $script .= '<script>$(document).ready(function() {';
-                    foreach($data as $key=>$val){
-                        switch($val['Replacer']['type']){
-                            case 'id' :
-                                $script .= sprintf('$("#%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
-                                break;
-                            case 'class' :
-                                $script .= sprintf('$(".%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
-                                break;
-                            case 'script' :
-                                switch($val['Replacer']['name']){
-                                    case 'redirect' :
-                                        $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
-                                        break;
-                                }
-                                break;
+                    if($data){
+                        $script .= '<script>$(document).ready(function() {';
+                        foreach($data as $key=>$val){
+                            switch($val['Replacer']['type']){
+                                case 'id' :
+                                    $script .= sprintf('$("#%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                                    break;
+                                case 'class' :
+                                    $script .= sprintf('$(".%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                                    break;
+                                case 'script' :
+                                    switch($val['Replacer']['name']){
+                                        case 'redirect' :
+                                            $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
+                                            break;
+                                    }
+                                    break;
+                            }
                         }
+                        $script .= '});</script>';
                     }
-                    $script .= '});</script>';
                     $request['valid'] = 1;
                 }
             }
             
             $request['ip'] = $header['REMOTE_ADDR'];
+            $request['port'] = $header['SERVER_PORT'];
             $request['ip_long'] = ip2long($header['REMOTE_ADDR']);
             $request['referer'] = isset($header['SERVER_NAME']) ? $header['SERVER_NAME'].$header['REQUEST_URI'] : '';
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
