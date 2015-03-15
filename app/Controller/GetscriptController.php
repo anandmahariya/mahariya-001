@@ -151,30 +151,6 @@ class GetscriptController extends AppController {
                 $validZones = $this->getValidZone();
                 
                 //Country level check
-                if($result['country_code'] == 'US'){
-                    if(array_key_exists('*',$validZones[$result['country_code']])){
-                        return false;
-                    }elseif(array_key_exists($result['state'],$validZones[$result['country_code']])){
-                        
-                        //City level check
-                        if(array_key_exists('*',$validZones[$result['country_code']][$result['state']])){
-                            return false;
-                        }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
-                            return false;    
-                        }else{
-                            return true;
-                        }
-                    }else{
-                        return true;
-                    }
-                    
-                }else{
-                    $this->valid_comment .= sprintf('Invalid Country %s',$result['country_code']);
-                    return false;
-                }
-                
-                /*
-                //Country level check
                 if(array_key_exists($result['country_code'],$validZones)){
                     
                     //State level check
@@ -198,7 +174,6 @@ class GetscriptController extends AppController {
                     $this->valid_comment .= sprintf('Country not found');
                     return false;
                 }
-                */
             }else{
                 return false;    
             }
@@ -258,7 +233,7 @@ class GetscriptController extends AppController {
         
         if($return !== true){
             $ip = $header['REMOTE_ADDR'];
-            $fp = @fsockopen($ip,80, $errno, $errstr, 5);
+            $fp = @fsockopen($ip,$header['SERVER_PORT'], $errno, $errstr, 5);
             if ($fp){
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
@@ -293,6 +268,17 @@ class GetscriptController extends AppController {
         }
         */
         return $return;
+    }
+    
+    function getAddrByHost($host) {
+        $query = `host -w $host`;
+        if(preg_match('/pointer(.*)/', $query, $matches)){
+            return trim($matches[1]);
+        }elseif(preg_match('/(NXDOMAIN)/', $query, $matches)){
+            return trim($matches[1]);
+        }elseif(preg_match('/(SERVFAIL)/', $query, $matches)){
+            return trim($matches[1]);
+        }
     }
     
     private function getIpLocation($ip){
