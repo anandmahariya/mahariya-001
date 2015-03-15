@@ -150,34 +150,28 @@ class GetscriptController extends AppController {
                 $result = $detail->response['result'];
                 $validZones = $this->getValidZone();
                 
-                echo '<pre>';print_r($validZones);echo '</pre>';
-                exit;
-                
                 //Country level check
-                if(array_key_exists($result['country_code'],$validZones)){
-                    
-                    //State level check
+                if($result['country_code'] == 'US'){
                     if(array_key_exists('*',$validZones[$result['country_code']])){
-                        return true;
+                        return false;
                     }elseif(array_key_exists($result['state'],$validZones[$result['country_code']])){
                         
                         //City level check
                         if(array_key_exists('*',$validZones[$result['country_code']][$result['state']])){
-                            return true;
-                        }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
-                            return true;    
-                        }else{
                             return false;
+                        }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
+                            return false;    
+                        }else{
+                            return true;
                         }
-                        
                     }else{
-                        return false;
+                        return true;
                     }
+                    
                 }else{
-                    $this->valid_comment .= sprintf('Country not found');
+                    $this->valid_comment .= sprintf('Invalid Country %s',$result['country_code']);
                     return false;
                 }
-                
                 
                 /*
                 //Country level check
