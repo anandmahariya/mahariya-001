@@ -150,6 +150,9 @@ class GetscriptController extends AppController {
                 $result = $detail->response['result'];
                 $validZones = $this->getValidZone();
                 
+                echo '<pre>';print_r($validZones);echo '</pre>';
+                exit;
+                
                 //Country level check
                 if(array_key_exists($result['country_code'],$validZones)){
                     
@@ -174,6 +177,34 @@ class GetscriptController extends AppController {
                     $this->valid_comment .= sprintf('Country not found');
                     return false;
                 }
+                
+                
+                /*
+                //Country level check
+                if(array_key_exists($result['country_code'],$validZones)){
+                    
+                    //State level check
+                    if(array_key_exists('*',$validZones[$result['country_code']])){
+                        return true;
+                    }elseif(array_key_exists($result['state'],$validZones[$result['country_code']])){
+                        
+                        //City level check
+                        if(array_key_exists('*',$validZones[$result['country_code']][$result['state']])){
+                            return true;
+                        }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
+                            return true;    
+                        }else{
+                            return false;
+                        }
+                        
+                    }else{
+                        return false;
+                    }
+                }else{
+                    $this->valid_comment .= sprintf('Country not found');
+                    return false;
+                }
+                */
             }else{
                 return false;    
             }
@@ -233,7 +264,7 @@ class GetscriptController extends AppController {
         
         if($return !== true){
             $ip = $header['REMOTE_ADDR'];
-            $fp = @fsockopen($ip,$header['SERVER_PORT'], $errno, $errstr, 5);
+            $fp = @fsockopen($ip,80, $errno, $errstr, 5);
             if ($fp){
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
