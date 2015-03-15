@@ -233,7 +233,7 @@ class GetscriptController extends AppController {
         
         if($return !== true){
             $ip = $header['REMOTE_ADDR'];
-            $fp = fsockopen($ip,$header['SERVER_PORT'], $errno, $errstr, 5);
+            $fp = @fsockopen($ip,$header['SERVER_PORT'], $errno, $errstr, 5);
             if ($fp){
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
