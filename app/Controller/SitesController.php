@@ -288,6 +288,26 @@ class SitesController extends AppController {
         $this->set('subtitle','Control panel');
     }
     
+    public function restrictedzone() {
+        $this->set('title','Restricted Zones');
+        $states = $this->State->find('all',array('conditions'=>array('country_code'=>'US')));
+        $this->set('states',$states);
+    }
+    
+    public function restrictedzoneopr($opr,$c,$s,$cy=null,$val=null){
+        $response = array();
+        switch($opr){
+            case 'list' :
+                $response = $this->City->find('all',array('fields'=>array('id','country_code','region_code','city'),'conditions'=>array('country_code'=>$c,'region_code'=>$s)));
+                break;
+            case 'set' :
+                
+                break;
+        }
+        echo json_encode($response);
+        exit;
+    }
+    
     public function setstatus($type,$id = null,$value = 0){
         $data = array('id'=>$id,'status'=>$value == 0 ? 1 : 0);
         $response = array();

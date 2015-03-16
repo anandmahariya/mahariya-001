@@ -44,6 +44,9 @@
                 <li class="<?php echo in_array($this->action,array('validzone','validzoneopr')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Valid Zone'),array('controller' => 'sites','action' => 'validzone'),array('escape'=>false)) ?>
                 </li>
+                <li class="<?php echo in_array($this->action,array('restrictedzone','restrictedzoneopr')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Restricted Zone'),array('controller' => 'sites','action' => 'restrictedzone'),array('escape'=>false)) ?>
+                </li>
             </ul>
         </li>
         <li class="treeview <?php echo $this->name == 'Settings' ? 'active' : '' ?>">
