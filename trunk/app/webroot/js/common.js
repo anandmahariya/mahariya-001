@@ -211,6 +211,9 @@ $(function(){
     });
     
     //*************************************************************************************
+    if ($("body").data("title") === "Dashboard-analytics") {
+	renderAnalyticsCharts();
+    }
     //Analytics JS
     //Form Dashboard Analytics
     $('#analyticsDate').datepicker({
@@ -224,12 +227,14 @@ $(function(){
 	renderAnalyticsCharts();
     });
     
-    renderAnalyticsCharts();
+    
     function renderAnalyticsCharts(){
 	$('#request-analytics-chart').html(loaderCenter);
 	$('#request-analytics-chart-vip').html(loaderCenter);
+	$('#request-analytics-chart-city').html(loaderCenter);
 	renderAnalyticsReqChart();
 	renderAnalyticsReqChart_Vip();
+	renderAnalyticsCityChart();
     }
     
     function renderAnalyticsReqChart_Vip(){
@@ -257,6 +262,17 @@ $(function(){
         });
     }
     
+    function renderAnalyticsCityChart() {
+	var postData = $('#analyticsAnalyticsForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/analytic_city',
+	    data: postData, 
+	    success: function(response){
+		$('#request-analytics-chart-city').html(response);
+	    }
+        });
+    }
     
     function renderAnalyticsReqChart(){
 	var postData = $('#analyticsAnalyticsForm').serialize();
@@ -283,6 +299,33 @@ $(function(){
         });
     }
     
+    //*************************************************************************************
+    //Restricted Zone script
+    $('#restrictedzone').accordion({
+	header: '.tmpheader',
+	autoHeight: false,
+	clearStyle: true,
+	heightStyle: "content" ,
+	beforeActivate: function( event, ui ) {
+	    var country = ui.newHeader.attr('data-country');
+	    var state = ui.newHeader.attr('data-state');
+	    $('.containerRestrictedZone').html('');
+	    $.ajax({
+		type: "GET",
+		url: base_url + 'sites/restrictedzoneopr/list/'+country+'/'+state,
+		success: function(response){
+		    var data = $.parseJSON(response);
+		    var table = '<div class="row">';
+		    $.each(data, function(key,val){
+			//console.log(val);
+			table += '<div class="form-group col-lg-3"><input type="checkbox"/>&nbsp;'+val.City.city+'</div>';
+		    });
+		    table += '</div>';
+		    $('#collapse-'+state+' .containerRestrictedZone').append(table);
+		}
+	    });
+	}
+    });
     //*************************************************************************************
     //Dashboard js
     //call first time when page load
