@@ -28,6 +28,41 @@ class DashboardController extends AppController {
     public function renderchart($type = null) {
         $result = array();
         switch($type){
+            case 'analytic_city' :
+                $post = $_POST['data']['analytics'];
+                $date_s = $this->Common->mysqlDate($post['date'],'dd/mm/yy','start');
+                $date_e = $this->Common->mysqlDate($post['date'],'dd/mm/yy','end');
+                
+                $conditions = '';
+                if($post['site'] != ''){
+                    $conditions = sprintf('And r.site_id = %d',$post['site']);
+                }
+                
+                $query = sprintf('SELECT SUM(1) as `tot`,ips.country,ips.country_code,ips.state,ips.city FROM `requests` r
+                                    left join ips on ips.ip_long = r.ip_long 
+                                    where  r.created between "%s" and "%s" %s
+                                    group by ips.city order by tot desc',$date_s,$date_e,$conditions);
+                
+                $dataset = $this->Request->query($query);
+                $total = 0;
+                $table = '<table class="table table-striped"><tbody><tr><th>Country</th><th>State</th><th>City</th><th>Visitors</th></tr>';
+                foreach($dataset as $key=>$val){
+                    $tmp = isset($val[0]['tot']) ? $val[0]['tot'] : 0;
+                    $total += $tmp;
+                    $table .= sprintf('<tr>
+                                        <td>%s</td>
+                                        <td>%s</td>
+                                        <td>%s</td>
+                                        <td>%d</td>
+                                        </tr>',$val['ips']['country']!=''?$val['ips']['country']:'--',
+                                        $val['ips']['state']!=''?$val['ips']['state']:'--',
+                                        $val['ips']['city']!=''?$val['ips']['city']:'--'
+                                        ,$tmp);
+                }
+                $table .= sprintf('<tr><td></td><td></td><td><b>Total</b></td><td>%d</td></tr>',$total);
+                echo $table .= '</table>';
+                exit;
+                break;
             case 'analytic_request' :
                 $post = $_POST['data']['analytics'];
                 $date = strtotime($this->Common->mysqlDate($post['date'],'dd/mm/yy'));
