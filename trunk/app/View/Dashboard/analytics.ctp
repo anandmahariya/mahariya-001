@@ -37,30 +37,19 @@
                             </div><!-- /.box -->
 
                             <!-- DONUT CHART -->
-                            <div class="box box-danger">
-                                <div class="box-header">
-                                    <h3 class="box-title">Donut Chart</h3>
-                                </div>
-                                <div class="box-body chart-responsive"></div><!-- /.box-body -->
-                            </div><!-- /.box -->
+                            
                             
                         </div><!-- /.col (LEFT) -->
                         <div class="col-md-6">
                             <!-- LINE CHART -->
                             <div class="box box-warning">
                                 <div class="box-header">
-                                    <h3 class="box-title">Line Chart</h3>
+                                    <h3 class="box-title">Location Chart</h3>
                                 </div>
-                                <div class="box-body chart-responsive"></div><!-- /.box-body -->
+                                <div id="request-analytics-chart-city" class="box-body table-responsive"></div><!-- /.box-body -->
                             </div><!-- /.box -->
 
-                            <!-- BAR CHART -->
-                            <div class="box box-success">
-                                <div class="box-header">
-                                    <h3 class="box-title">Bar Chart</h3>
-                                </div>
-                                <div class="box-body chart-responsive"></div><!-- /.box-body -->
-                            </div><!-- /.box -->
+                            
 
                         </div><!-- /.col (RIGHT) -->
                         
