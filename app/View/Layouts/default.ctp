@@ -9,8 +9,6 @@
 		echo $this->fetch('meta');
 	?>
 	<!-- bootstrap 3.0.2 -->
-        <link href="<?php echo Router::url('/', true); ?>css/jQueryUI/jquery-ui.css" rel="stylesheet" type="text/css" />
-	<!-- bootstrap 3.0.2 -->
         <link href="<?php echo Router::url('/', true); ?>css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <!-- font Awesome -->
         <link href="<?php echo Router::url('/', true); ?>css/font-awesome.min.css" rel="stylesheet" type="text/css" />
