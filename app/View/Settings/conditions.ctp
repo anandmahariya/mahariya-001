@@ -27,17 +27,6 @@
                     </div>
                     <div class="row">
                         <div class="form-group col-lg-2">
-                            Site Referer
-                        </div>
-                        <div class="form-group col-lg-4">
-                            <?php echo $this->Form->input('site_referer',array('class'=>'form-control','type' => 'textarea','label'=>false)); ?>
-                        </div>
-                        <div class="form-group col-lg-6">
-                            <p>Note : Insert all the site referer url you want to allow</p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="form-group col-lg-2">
                             Zones
                         </div>
                         <div class="form-group col-lg-4">
@@ -50,6 +39,29 @@
                             ?>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="form-group col-lg-2">
+                            Site Referer
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <?php echo $this->Form->input('site_referer',array('class'=>'form-control','type' => 'textarea','label'=>false)); ?>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <p>Note : Insert all the site referer url you want to allow</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-2">
+                            Block DNS
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <?php echo $this->Form->input('block_dns',array('class'=>'form-control','type' => 'textarea','label'=>false)); ?>
+                        </div>
+                        <div class="form-group col-lg-6">
+                            <p>Note : Insert Block DNS name</p>
+                        </div>
+                    </div>
+                    
                 </div><!-- /.box-body -->
                 <div class="box-footer">
                     <button type="submit" class="btn btn-primary btn-sm"><?php echo __('Save') ?></button>
