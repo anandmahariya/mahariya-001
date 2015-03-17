@@ -8,7 +8,7 @@ class GetscriptController extends AppController {
     public $location = array();
     public $condition = array();
     public $comments = '';
-    public $dns = null;
+    public $dns = '';
     public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone',
                          'Country','State','City','Ip','Request','Option','Blockip');
     
