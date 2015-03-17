@@ -366,6 +366,18 @@ class SitesController extends AppController {
                     $response['status'] = false;
                 }                
                 break;
+            case 'restrictedzone' :
+                if($data['id'] != null){
+                    if($tmp = $this->RestrictedZone->save($data)){
+                        $response['status'] = true;
+                        $response['value'] = $tmp['RestrictedZone']['status'];
+                    }else{
+                        $response['status'] = false;    
+                    }
+                }else{
+                    $response['status'] = false;
+                }                
+                break;
             case 'validsite' :
                 if($data['id'] != null){
                     if($tmp = $this->Site->save($data)){

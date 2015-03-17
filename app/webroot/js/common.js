@@ -169,11 +169,14 @@ $(function(){
 	    case 'zone' :
 		url = base_url + "sites/setstatus/validzone/" + $(this).attr('id') + '/' +$(this).attr('value');
 		break;
+	    case 'restrictedzone' :
+		url = base_url + "sites/setstatus/restrictedzone/" + $(this).attr('id') + '/' +$(this).attr('value');
+		break;
 	    case 'replacer' :
 		url = base_url + "sites/setstatus/replacer/" + $(this).attr('id') + '/' +$(this).attr('value');
 		break;
 	}
-	
+
 	$.ajax({
 	    url: url,
 	    dataType: "json",
