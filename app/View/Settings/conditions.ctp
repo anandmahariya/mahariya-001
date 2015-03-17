@@ -22,7 +22,7 @@
                             User Valid Hits
                         </div>
                         <div class="form-group col-lg-4">
-                            <?php echo $this->Form->input('valid_hits',array('class'=>'form-control','options'=>range(1,10),'label'=>false)); ?>
+                            <?php echo $this->Form->input('valid_hits',array('class'=>'form-control','options'=>array_combine(range(1,10), range(1,10)),'label'=>false)); ?>
                         </div>
                     </div>
                     <div class="row">
@@ -34,6 +34,20 @@
                         </div>
                         <div class="form-group col-lg-6">
                             <p>Note : Insert all the site referer url you want to allow</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-lg-2">
+                            Zones
+                        </div>
+                        <div class="form-group col-lg-4">
+                            <?php
+                                echo $this->Form->radio('zone',
+                                                        array('valid'=>'&nbsp;&nbsp;Valid Zone&nbsp;&nbsp;&nbsp;&nbsp;',
+                                                              'restricted'=>'&nbsp;&nbsp;Restricted Zone'),
+                                                        array('legend' => false)
+                                                        );
+                            ?>
                         </div>
                     </div>
                 </div><!-- /.box-body -->

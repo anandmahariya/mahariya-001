@@ -1,27 +1,60 @@
+<?php
+    $true = $this->Html->image('test-pass-icon.png',array('alt'=>'Active'));
+    $false = $this->Html->image('test-fail-icon.png',array('alt'=>'De-active'));
+?>
 <div class="row">
-     <div class="col-md-12">
-          <div class="box box-solid">
-               <div class="box-body">
-                    <div class="box-group" id="restrictedzone">
+    <!-- left column -->
+    <div class="col-md-12">
+        <!-- general form elements -->
+        <div class="box box-primary">
+             <div class="box-body table-responsive">
+                <table id="example1" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>State</th>
+                            <th>City</th>
+                            <th>Status</th>
+                            <th width="10%">&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            if(count($data) > 0){
+                                foreach($data as $key=>$val){
+                                    
+                                    $delete = $this->html->url(array('controller'=>'sites',
+                                                                   'action'=>'restrictedzoneopr',
+                                                                   '?'=>array('action'=>_encode(array('id'=>$val['RestrictedZone']['id'],'opr'=>'delete')))));
+                                    
+                                    echo '<tr>';
+                                    echo sprintf('<td>%s</td>',$val['RestrictedZone']['country']);
+                                    echo sprintf('<td>%s</td>',$val['RestrictedZone']['state']);
+                                    echo sprintf('<td>%s</td>',$val['RestrictedZone']['city']);
+                                    echo sprintf('<td><a href="javascript:void(0)" id="%d" value="%d" type="zone" class="changestatus">%s</a></td>',
+                                                 $val['RestrictedZone']['id'],
+                                                 $val['RestrictedZone']['status'],
+                                                 $val['RestrictedZone']['status'] != 1 ? $false : $true );
+                                    
+                                    echo sprintf('<td><a class="btn btn-danger btn-sm confirm" href="%s">delete</a></td>',$delete);
+                                    echo '</tr>';
+                                }
+                            }else{
+                                echo '<tr><td colspan="5">No Record Found</td></tr>';
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+            <div class="box-footer clearfix">
+                <div class="row pull-right">
+                    <div class="col-xs-12">
                     <?php
-                    $box_color = array('box-primary','box-danger','box-success','box-warning');
-                    foreach($states as $key=>$val) { ?>
-                         <div class="panel box <?php echo $box_color[rand(0,count($box_color) - 1)]; ?>">
-                              <div class="tmpheader" data-country="<?php echo $val['State']['country_code'] ?>" data-state="<?php echo $val['State']['code'] ?>">
-                                   <div class="box-header">
-                                        <h4 class="box-title">
-                                             <a href="#collapse-<?php echo $val['State']['code'] ?>">
-                                                  <?php echo $val['State']['name']?>
-                                             </a>
-                                        </h4>
-                                   </div>
-                              </div>
-                              <div id="collapse-<?php echo $val['State']['code'] ?>" class="panel-collapse collapse">
-                                   <div class="box-body containerRestrictedZone"></div>
-                              </div>
-                         </div>
-                    <?php } ?>
-               </div>
-          </div><!-- /.box-body -->
-     </div><!-- /.box -->
+                    echo $this->Html->link('Add Restricted Zone',array('controller'=>'sites','action'=>'restrictedzoneopr','?'=>array('action'=>_encode(array('opr'=>'add')))),array('class'=>'btn btn-success btn-sm'));
+                    ?>
+                    </div>
+                </div>
+            </div>
+        </div><!-- /.box -->
+    </div><!--/.col (left) -->
 </div>

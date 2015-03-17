@@ -1,7 +1,7 @@
 <?php
 class SitesController extends AppController {
 
-    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Request');
+    public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone','Country','State','City','Request');
     var $helpers = array('Html');
     
     public function beforefilter(){
@@ -288,24 +288,66 @@ class SitesController extends AppController {
         $this->set('subtitle','Control panel');
     }
     
-    public function restrictedzone() {
-        $this->set('title','Restricted Zones');
-        $states = $this->State->find('all',array('conditions'=>array('country_code'=>'US')));
-        $this->set('states',$states);
+        public function restrictedzone() {
+        
+        $query = sprintf("select rz.id,c.name as country,
+                         if(s.name is null,'*',s.name) as state,
+                         if(ci.city is null,'*',ci.city) as city,
+                         rz.status from restricted_zones rz
+                         left join countries c on c.code = rz.country
+                         left join states s on s.country_code = rz.country AND s.code = rz.state
+                         left join cities ci on ci.id = rz.city");
+        
+        $tmp = $this->RestrictedZone->query($query);
+        
+        $response = array();
+        foreach($tmp as $key=>$val){
+            $response[] = array('RestrictedZone'=>array('id'=>$val['rz']['id'],'country'=>$val['c']['country'],'state'=>$val['0']['state'],'city'=>$val['0']['city'],'status'=>$val['rz']['status']));
+        }
+        
+        $this->set('data',$response);
+        $this->set('title','Restricted Zone');
     }
     
-    public function restrictedzoneopr($opr,$c,$s,$cy=null,$val=null){
-        $response = array();
-        switch($opr){
-            case 'list' :
-                $response = $this->City->find('all',array('fields'=>array('id','country_code','region_code','city'),'conditions'=>array('country_code'=>$c,'region_code'=>$s)));
-                break;
-            case 'set' :
-                
-                break;
+    public function restrictedzoneopr(){
+        
+        $back = array('controller'=>'sites','action'=>'restrictedzone');
+        $formUrl = array('controller'=>'sites','action'=>'restrictedzoneopr');
+        
+        if($this->request->data){
+            $this->RestrictedZone->set($this->request->data);
+            if ($this->RestrictedZone->validates()) {
+                $data =  $this->RestrictedZone->save($this->request->data);
+                $this->Session->setFlash(__('Record successfully saved.'),'success');
+                $this->redirect($back);
+            } else {
+                $errors = $this->RestrictedZone->validationErrors;
+            }
         }
-        echo json_encode($response);
-        exit;
+        
+        if(isset($_GET['action'])){
+            $opr = _decode($_GET['action']);
+            if(isset($opr['opr'])){
+                switch($opr['opr']){
+                    case 'delete' :
+                        if($this->RestrictedZone->delete(array('id'=>$opr['id']))){
+                            $this->Session->setFlash(__('Record successfully deleted.'),'success');
+                        }else{
+                            $this->Session->setFlash(__('Record not deleted.'),'error');
+                        }
+                        $this->redirect(array('controller'=>'sites','action'=>'restrictedzone'));
+                        exit;
+                        break;
+                }
+            }
+        }
+        
+        $this->set('country',$this->Country->find('list',array('fields'=>array('Country.code','Country.name'),'order'=>array('Country.name'))));
+        
+        $this->set('back',$back);
+        $this->set('formUrl',$formUrl);
+        
+        $this->set('title','Restricted Zone');
     }
     
     public function setstatus($type,$id = null,$value = 0){
