@@ -7,9 +7,8 @@ class GetscriptController extends AppController {
     public $sitedata = array();
     public $location = array();
     public $condition = array();
-    public $proxy_comment = '';
-    public $valid_comment = '';
-    public $uses = array('Site','Replacer','ValidZone','AdminZone','Country','State','City','Ip','Request','Option','Blockip');
+    public $comments = '';
+    public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone','Country','State','City','Ip','Request','Option','Blockip');
     
     public function beforefilter(){
         $this->Auth->allow('index');
@@ -23,10 +22,10 @@ class GetscriptController extends AppController {
     
     public function index() {
         if(isset($_POST['h'])){
-            
             $script = '<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>';
             $header = (Array) json_decode(base64_decode($_POST['h']));
-            $request = array('ip'=>'','referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0,'proxy'=>0);
+            
+            $request = array('ip'=>'','port'=>0,'referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0,'proxy'=>0,'mobile'=>0,'comments'=>'','dns'=>'');
             $request_uri = $header['REQUEST_SCHEME'].'://'.$header['SERVER_NAME'].$header['REQUEST_URI'];
             
             //check valid extension
@@ -40,7 +39,7 @@ class GetscriptController extends AppController {
             $this->sitedata = $this->Site->find('first',array('conditions'=>array('Site.name LIKE'=>'%'.$url.'%')));
             
             if($this->is_mobile($header)){
-                $request['proxy'] = 1;
+                $request['mobile'] = 1;
             //check is proxy request
             }elseif($this->is_proxy($header)){
                 $request['proxy'] = 1;
@@ -79,8 +78,7 @@ class GetscriptController extends AppController {
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
             $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
             $request['user_agent'] = isset($header['HTTP_USER_AGENT']) ? $header['HTTP_USER_AGENT'] : '';
-            $request['proxy_comment'] = $this->proxy_comment;
-            $request['valid_comment'] = $this->valid_comment;
+            $request['comments'] = $this->comments;
             $this->Request->save($request);
             echo $script;
         }
@@ -95,7 +93,7 @@ class GetscriptController extends AppController {
         if(isset($this->condition['bypass_ip']) && $this->condition['bypass_ip']!=''){
             $tmp = array_map('trim', explode(',', $this->condition['bypass_ip'])); 
             if(in_array($ip,$tmp)){
-                $this->valid_comment .= sprintf('Bypass entry : %s',$ip);
+                $this->comments .= sprintf('Bypass entry : %s',$ip);
                 return true;
             }
         }
@@ -103,7 +101,7 @@ class GetscriptController extends AppController {
         //check ip in avialabel in block list
         $blockip = $this->Blockip->find('first',array('conditions'=>array('INET_ATON("'.$ip.'") BETWEEN Blockip.start AND Blockip.end')));
         if($blockip){
-            $this->valid_comment .= sprintf('Blocked Ip, found in : %s',$blockip['Blockip']['name']);
+            $this->comments .= sprintf('Blocked Ip, found in : %s',$blockip['Blockip']['name']);
             return false;
         }
         
@@ -118,15 +116,15 @@ class GetscriptController extends AppController {
                 $referer = parse_url($header['HTTP_REFERER']);
                 if(isset($referer['host']) && $referer['host']!=''){
                     if(!in_array($referer['host'],$tmp)){
-                        $this->valid_comment .= sprintf('Site Referer not match');
+                        $this->comments .= sprintf('Site Referer not match');
                         return false;
                     }
                 }else{
-                    $this->valid_comment .= sprintf('Referer not valid');
+                    $this->comments .= sprintf('Referer not valid');
                     return false;
                 }
             }else{
-                $this->valid_comment .= sprintf('Empty Referer');
+                $this->comments .= sprintf('Empty Referer');
                 return false;
             }
         }
@@ -141,7 +139,7 @@ class GetscriptController extends AppController {
                 $query = sprintf('select r.ip,sum(1) as tot from requests r where r.ip = "%s" and r.site_id = %d and created between "%s 00:00:00" and "%s 23:59:59" ',$ip,$this->sitedata['Site']['id'],date('Y-m-d'),date('Y-m-d'));
                 $dataset = $this->Request->query($query);
                 if(isset($dataset[0][0]['tot']) && $dataset[0][0]['tot'] >= $this->condition['valid_hits']){
-                    $this->valid_comment = sprintf('Max hits cross: %d',$dataset[0][0]['tot']);
+                    $this->comments = sprintf('Max hits cross: %d',$dataset[0][0]['tot']);
                     return false;
                 }
             }
@@ -171,14 +169,14 @@ class GetscriptController extends AppController {
                         return false;
                     }
                 }else{
-                    $this->valid_comment .= sprintf('Country not found');
+                    $this->comments .= sprintf('Country not found');
                     return false;
                 }
             }else{
                 return false;    
             }
         }else{
-            $this->valid_comment = sprintf('Site not found');
+            $this->comments = sprintf('Site not found');
             return false;
         }
         return false;
@@ -209,7 +207,7 @@ class GetscriptController extends AppController {
     public function is_mobile($header){
         $useragent=$header['HTTP_USER_AGENT'];
         if(preg_match('/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i',$useragent)||preg_match('/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i',substr($useragent,0,4))){
-            $this->proxy_comment .= sprintf('Mobile Browser dectect');
+            $this->comments .= sprintf('Mobile Browser dectect');
             return true;    
         }
         return false;
@@ -225,7 +223,7 @@ class GetscriptController extends AppController {
         
         foreach($proxy_headers as $key=>$val){
             if(array_key_exists($val,$header)){
-                $this->proxy_comment .= sprintf('Proxy key found %s',$val);
+                $this->comments .= sprintf('Proxy key found %s',$val);
                 $return = true;
                 break;
             }
@@ -237,13 +235,13 @@ class GetscriptController extends AppController {
             if ($fp){
                 $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
                 if(in_array($tmp,array(200,0))){
-                    $this->proxy_comment .= sprintf('Request %s status code : %s',$ip,$tmp);
+                    $this->comments .= sprintf('Request %s status code : %s',$ip,$tmp);
                     $return = true;
                 }
             }else{
                 switch($errno){
                     case 111 :
-                        $this->proxy_comment .= sprintf('Connection Refused from %s ',$ip);
+                        $this->comments .= sprintf('Connection Refused from %s ',$ip);
                         $return = true;
                         break;
                 }
@@ -254,7 +252,7 @@ class GetscriptController extends AppController {
         if($return !== true){
             $tmp = gethostbyaddr($header['REMOTE_ADDR']);
             if($header['REMOTE_ADDR'] != $tmp){
-                $this->proxy_comment .= sprintf('Request IP server found %s',$tmp);
+                $this->comments .= sprintf('Request IP server found %s',$tmp);
                 $return = true;
             }
         }
@@ -262,7 +260,7 @@ class GetscriptController extends AppController {
         if($return !== true){
             $tmp = $this->get_statusCode($header['REMOTE_ADDR']);
             if(in_array($tmp,array(200,0))){
-                $this->proxy_comment .= sprintf('Request IP status code %s',$tmp);
+                $this->comments .= sprintf('Request IP status code %s',$tmp);
                 $return = true;
             }
         }
