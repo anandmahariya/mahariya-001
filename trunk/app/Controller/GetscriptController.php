@@ -8,7 +8,9 @@ class GetscriptController extends AppController {
     public $location = array();
     public $condition = array();
     public $comments = '';
-    public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone','Country','State','City','Ip','Request','Option','Blockip');
+    public $dns = null;
+    public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone',
+                         'Country','State','City','Ip','Request','Option','Blockip');
     
     public function beforefilter(){
         $this->Auth->allow('index');
@@ -25,7 +27,9 @@ class GetscriptController extends AppController {
             $script = '<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>';
             $header = (Array) json_decode(base64_decode($_POST['h']));
             
-            $request = array('ip'=>'','port'=>0,'referer'=>'','device'=>'','os'=>'','browser'=>'','valid'=>0,'proxy'=>0,'mobile'=>0,'comments'=>'','dns'=>'');
+            $request = array('ip'=>'','port'=>0,'referer'=>'','device'=>'','os'=>'',
+                             'browser'=>'','valid'=>0,'proxy'=>0,'mobile'=>0,'comments'=>'','dns'=>'');
+            
             $request_uri = $header['REQUEST_SCHEME'].'://'.$header['SERVER_NAME'].$header['REQUEST_URI'];
             
             //check valid extension
@@ -78,6 +82,7 @@ class GetscriptController extends AppController {
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
             $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
             $request['user_agent'] = isset($header['HTTP_USER_AGENT']) ? $header['HTTP_USER_AGENT'] : '';
+            $request['dns'] = $this->dns;
             $request['comments'] = $this->comments;
             $this->Request->save($request);
             echo $script;
@@ -132,8 +137,11 @@ class GetscriptController extends AppController {
         //Get location of IP
         $this->location = $detail = $this->getIpLocation($ip);
         
+        //check blocked ip address
+        $this->dns = $this->getAddrByHost($ip);
+        
         if($this->sitedata){
-            
+            /*          
             //block which user who visit the site more than one time
             if(isset($this->condition['valid_hits']) && $this->condition['valid_hits'] >= 0){
                 $query = sprintf('select r.ip,sum(1) as tot from requests r where r.ip = "%s" and r.site_id = %d and created between "%s 00:00:00" and "%s 23:59:59" ',$ip,$this->sitedata['Site']['id'],date('Y-m-d'),date('Y-m-d'));
@@ -143,36 +151,76 @@ class GetscriptController extends AppController {
                     return false;
                 }
             }
+            */
             
-            if(isset($detail->response['status']) && $detail->response['status'] == 1 && $this->sitedata['Site']['status'] == 1){
-                $result = $detail->response['result'];
-                $validZones = $this->getValidZone();
-                
-                //Country level check
-                if(array_key_exists($result['country_code'],$validZones)){
+            if($this->sitedata['Site']['status'] == 1){
+                if(isset($detail->response['status']) && $detail->response['status'] == 1){
+                    $result = $detail->response['result'];
                     
-                    //State level check
-                    if(array_key_exists('*',$validZones[$result['country_code']])){
-                        return true;
-                    }elseif(array_key_exists($result['state'],$validZones[$result['country_code']])){
-                        
-                        //City level check
-                        if(array_key_exists('*',$validZones[$result['country_code']][$result['state']])){
-                            return true;
-                        }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
-                            return true;    
-                        }else{
-                            return false;
-                        }
-                        
-                    }else{
-                        return false;
+                    //check which condition is apply
+                    switch($this->condition['zone']){
+                        case 'valid' :
+                            $validZones = $this->getValidZone();
+                            //Country level check
+                            if(array_key_exists($result['country_code'],$validZones)){
+                                
+                                //State level check
+                                if(array_key_exists('*',$validZones[$result['country_code']])){
+                                    return true;
+                                }elseif(array_key_exists($result['state'],$validZones[$result['country_code']])){
+                                    
+                                    //City level check
+                                    if(array_key_exists('*',$validZones[$result['country_code']][$result['state']])){
+                                        return true;
+                                    }elseif(array_key_exists($result['city'],$validZones[$result['country_code']][$result['state']])){
+                                        return true;    
+                                    }else{
+                                        return false;
+                                    }
+                                    
+                                }else{
+                                    return false;
+                                }
+                            }else{
+                                $this->comments .= sprintf('Country not found');
+                                return false;
+                            }
+                            break;
+                        case 'restricted' :
+                            $restrictedZones = $this->getRestrictedZone();
+                            //Country level check
+                            if(array_key_exists($result['country_code'],$restrictedZones)){
+                                $this->comments .= sprintf('Country found in restricted zone : %s',$result['country_code']);
+                                return false;
+                            }else{
+                                //State level check
+                                if(isset($restrictedZones[$result['country_code']]) && array_key_exists('*',$restrictedZones[$result['country_code']])){
+                                    $this->comments .= sprintf('All State are restricted in : %s country',$result['country_code']);
+                                    return false;
+                                }elseif(isset($restrictedZones[$result['country_code']]) && array_key_exists($result['state'],$restrictedZones[$result['country_code']])){
+                                    $this->comments .= sprintf('State found in restricted zone : %s country %s state',$result['country_code'],$result['state']);
+                                    return false;
+                                }else{
+                                    //City level check
+                                    if(isset($restrictedZones[$result['country_code']][$result['state']]) && array_key_exists('*',$restrictedZones[$result['country_code']][$result['state']])){
+                                        $this->comments .= sprintf('All City are restricted in : %s country %s state',$result['country_code'],$result['state']);
+                                        return false;
+                                    }elseif(isset($restrictedZones[$result['country_code']][$result['state']]) && array_key_exists($result['city'],$restrictedZones[$result['country_code']][$result['state']])){
+                                        $this->comments .= sprintf('City found restricted in : %s country %s state',$result['country_code'],$result['state']);
+                                        return false;
+                                    }else{
+                                        return true;
+                                    }
+                                }
+                            }
+                            break;
                     }
                 }else{
-                    $this->comments .= sprintf('Country not found');
-                    return false;
+                    $this->comments .= sprintf('ip2location data not found');
+                    return false;    
                 }
             }else{
+                $this->comments .= sprintf('Site Status 0 found');
                 return false;    
             }
         }else{
@@ -229,6 +277,7 @@ class GetscriptController extends AppController {
             }
         }
         
+        /*
         if($return !== true){
             $ip = $header['REMOTE_ADDR'];
             $fp = @fsockopen($ip,$header['SERVER_PORT'], $errno, $errstr, 5);
@@ -268,7 +317,7 @@ class GetscriptController extends AppController {
         return $return;
     }
     
-    function getAddrByHost($host) {
+    private function getAddrByHost($host) {
         $query = `host -w $host`;
         if(preg_match('/pointer(.*)/', $query, $matches)){
             return trim($matches[1]);
@@ -326,6 +375,48 @@ class GetscriptController extends AppController {
                          where vz.status = 1");
         
         $tmp = $this->ValidZone->query($query);
+        
+        $response = array();
+        foreach($tmp as $key=>$val){
+            $country = $val['c']['country'];
+            $state = $val['0']['state'];
+            $city = $val['0']['city'];
+            $response[$country][$state][$city] = 'valid';
+        }
+        
+        //Filter array on country level
+        foreach($response as $key=>$val){
+            if(array_key_exists('*',$val)){
+                $response[$key] = array('*'=>'all');
+            }
+        }
+        
+        //Filter array on state level
+        foreach($response as $key=>$val){
+            if(is_array($val)){
+                foreach($val as $k=>$v){
+                    if(array_key_exists('*',$v)){
+                        $response[$key][$k] = array('*'=>'all');
+                    }
+                }
+            }
+        }
+        return $response;
+    }
+    
+    public function getRestrictedZone(){
+        
+        $response = array();
+        $query = sprintf("select vz.id,c.code as country,
+                         if(s.name is null,'*',s.name) as state,
+                         if(ci.city is null,'*',ci.city) as city,
+                         vz.status from restricted_zones vz
+                         left join countries c on c.code = vz.country
+                         left join states s on s.country_code = vz.country AND s.code = vz.state
+                         left join cities ci on ci.id = vz.city
+                         where vz.status = 1");
+        
+        $tmp = $this->RestrictedZone->query($query);
         
         $response = array();
         foreach($tmp as $key=>$val){

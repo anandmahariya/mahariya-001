@@ -68,6 +68,7 @@
                             <th>Page Url</th>
                             <th>Site Referer</th>
                             <th>Proxy</th>
+                            <th>Mobile</th>
                             <th><?php echo $this->Paginator->sort('valid'); ?></th>
                             <th><?php echo $this->Paginator->sort('created','Request Time'); ?></th>
                         </tr>
@@ -107,8 +108,9 @@
                             <td class="<?php echo $city; ?>"><?php echo $val['ip']['city'] ?></td>
                             <td><a href="javascript:void(0)" title="<?php echo $val['Request']['referer'] ?>"><?php echo $val['Request']['referer']; ?></a></td>
                             <td><a href="javascript:void(0)" data-toggle="tooltip" data-original-title="<?php echo $val['Request']['site_referer']?>"><?php echo $sReferer; ?></a></td>
-                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['proxy_comment']?>" href="javascript:void(0)"><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></a></td>
-                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['valid_comment']?>" href="javascript:void(0)"><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></a></td>
+                            <td><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></td>
+                            <td><?php echo $val['Request']['mobile'] == 1 ? $true : $false ?></td>
+                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['comments']?>" href="javascript:void(0)"><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></a></td>
                             <td><?php echo date('d M Y h:i:s A',strtotime($val['Request']['created'])) ?></td>
                         </tr>
                         <?php } ?>
