@@ -8,6 +8,7 @@
 		echo $this->Html->meta('icon');
 		echo $this->fetch('meta');
 	?>
+	<link href="<?php echo Router::url('/', true); ?>css/jQueryUI/jquery-ui.css" rel="stylesheet" type="text/css" />
 	<!-- bootstrap 3.0.2 -->
         <link href="<?php echo Router::url('/', true); ?>css/bootstrap.min.css" rel="stylesheet" type="text/css" />
         <!-- font Awesome -->
@@ -84,8 +85,6 @@
 	</div>
 	</div>
 	</div>
-	<!-- Modelbox end -->
-	
 	<!-- Jquery UI -->
 	<script src="<?php echo Router::url('/', true); ?>js/jquery-ui.js" type="text/javascript"></script>
 	<!-- Bootstrap -->
