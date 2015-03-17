@@ -31,7 +31,7 @@
                                     echo sprintf('<td>%s</td>',$val['RestrictedZone']['country']);
                                     echo sprintf('<td>%s</td>',$val['RestrictedZone']['state']);
                                     echo sprintf('<td>%s</td>',$val['RestrictedZone']['city']);
-                                    echo sprintf('<td><a href="javascript:void(0)" id="%d" value="%d" type="zone" class="changestatus">%s</a></td>',
+                                    echo sprintf('<td><a href="javascript:void(0)" id="%d" value="%d" type="restrictedzone" class="changestatus">%s</a></td>',
                                                  $val['RestrictedZone']['id'],
                                                  $val['RestrictedZone']['status'],
                                                  $val['RestrictedZone']['status'] != 1 ? $false : $true );
