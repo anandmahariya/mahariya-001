@@ -141,4 +141,28 @@ class CommonComponent extends Component {
             'pattern'    => $pattern
         );
     }
+    
+    function getAddrByHost($host,$loop = 0){
+        $tmp = getAddrByHost_core($host);
+        if(in_array($tmp,array('NXDOMAIN','SERVFAIL'))){
+            if($loop >= 2){
+                return $tmp;
+            }else{
+                getAddrByHost($host,$loop + 1);
+            }
+        }else{
+            return $tmp;
+        }
+    }
+    
+    function getAddrByHost_core($host) {
+        $query = `host -w $host`;
+        if(preg_match('/pointer(.*)/', $query, $matches)){
+            return trim($matches[1]);
+        }elseif(preg_match('/(NXDOMAIN)/', $query, $matches)){
+            return trim($matches[1]);
+        }elseif(preg_match('/(SERVFAIL)/', $query, $matches)){
+            return trim($matches[1]);
+        }
+    }
 }
