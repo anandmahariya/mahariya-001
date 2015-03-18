@@ -102,7 +102,7 @@
                                 }
                         ?>
                         <tr>
-                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['dns']?>" href="javascript:void(0)"><?php echo $val['Request']['ip'] ?></a></td>
+                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['ip']['dns']?>" href="javascript:void(0)"><?php echo $val['Request']['ip'] ?></a></td>
                             <td class="<?php echo $country; ?>"><?php echo $val['ip']['country'] ?></td>
                             <td class="<?php echo $state; ?>"><?php echo $val['ip']['state'] ?></td>
                             <td class="<?php echo $city; ?>"><?php echo $val['ip']['city'] ?></td>
