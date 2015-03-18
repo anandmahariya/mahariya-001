@@ -8,7 +8,7 @@ class GetscriptController extends AppController {
     public $location = array();
     public $condition = array();
     public $comments = '';
-    public $dns = '';
+    public $components = array('RequestHandler','Common');
     public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone',
                          'Country','State','City','Ip','Request','Option','Blockip');
     
@@ -28,7 +28,7 @@ class GetscriptController extends AppController {
             $header = (Array) json_decode(base64_decode($_POST['h']));
             
             $request = array('ip'=>'','port'=>0,'referer'=>'','device'=>'','os'=>'',
-                             'browser'=>'','valid'=>0,'proxy'=>0,'mobile'=>0,'comments'=>'','dns'=>'');
+                             'browser'=>'','valid'=>0,'proxy'=>0,'mobile'=>0,'comments'=>'');
             
             $request_uri = $header['REQUEST_SCHEME'].'://'.$header['SERVER_NAME'].$header['REQUEST_URI'];
             
@@ -82,7 +82,6 @@ class GetscriptController extends AppController {
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
             $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
             $request['user_agent'] = isset($header['HTTP_USER_AGENT']) ? $header['HTTP_USER_AGENT'] : '';
-            $request['dns'] = $this->dns;
             $request['comments'] = $this->comments;
             $this->Request->save($request);
             echo $script;
@@ -317,17 +316,6 @@ class GetscriptController extends AppController {
         return $return;
     }
     
-    private function getAddrByHost($host) {
-        $query = `host -w $host`;
-        if(preg_match('/pointer(.*)/', $query, $matches)){
-            return trim($matches[1]);
-        }elseif(preg_match('/(NXDOMAIN)/', $query, $matches)){
-            return trim($matches[1]);
-        }elseif(preg_match('/(SERVFAIL)/', $query, $matches)){
-            return trim($matches[1]);
-        }
-    }
-    
     private function getIpLocation($ip){
         
         $response = (object) array('response'=>array('status'=>0,'result'=>null));
@@ -339,7 +327,7 @@ class GetscriptController extends AppController {
             $response->response['result'] = $resultSet['Ip'];
         }else{
             $detail = new IpToLocation($ip);
-            $data = array('ip'=>$ip,'ip_long'=>ip2long($ip),'country_code'=>'','country'=>'','state'=>'','city'=>'','latitude'=>'','longitude'=>'','status'=>0);
+            $data = array('ip'=>$ip,'ip_long'=>ip2long($ip),'dns'=>'','country_code'=>'','country'=>'','state'=>'','city'=>'','latitude'=>'','longitude'=>'','status'=>0);
             if(isset($detail->response['status']) && $detail->response['status'] == 1){
                 $data = array_merge($data,$detail->response['result']);
                 
@@ -352,6 +340,9 @@ class GetscriptController extends AppController {
             }else{
                 $data['status'] = 0;
             }
+            
+            //Get DNS of IP
+            $data['dns'] = $this->Common->getAddrByHost($ip);
             
             //data save in DB
             if($tmp = $this->Ip->save($data)){
