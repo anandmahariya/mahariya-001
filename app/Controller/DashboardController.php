@@ -281,7 +281,7 @@ class DashboardController extends AppController {
                                     'Request.valid',
                                     'Request.proxy',
                                     'Request.comments',
-                                    'Request.dns',
+                                    'ip.dns',
                                     'Request.mobile',
                                     'Request.created',
                                     'ip.country',
