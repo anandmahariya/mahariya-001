@@ -143,12 +143,12 @@ class CommonComponent extends Component {
     }
     
     function getAddrByHost($host,$loop = 0){
-        $tmp = getAddrByHost_core($host);
-        if(in_array($tmp,array('NXDOMAIN','SERVFAIL'))){
+        $tmp = $this->getAddrByHost_core($host);
+        if(in_array($tmp,array('NXDOMAIN','SERVFAIL','empty'))){
             if($loop >= 2){
                 return $tmp;
             }else{
-                getAddrByHost($host,$loop + 1);
+                return $this->getAddrByHost($host,$loop + 1);
             }
         }else{
             return $tmp;
@@ -156,13 +156,15 @@ class CommonComponent extends Component {
     }
     
     function getAddrByHost_core($host) {
-        $query = `host -w $host`;
+        $query = `host $host`;
         if(preg_match('/pointer(.*)/', $query, $matches)){
             return trim($matches[1]);
         }elseif(preg_match('/(NXDOMAIN)/', $query, $matches)){
             return trim($matches[1]);
         }elseif(preg_match('/(SERVFAIL)/', $query, $matches)){
             return trim($matches[1]);
+        }else{
+            return 'empty';
         }
     }
 }
