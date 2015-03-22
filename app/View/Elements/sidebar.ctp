@@ -65,6 +65,21 @@
                 <li class="<?php echo in_array($this->action,array('blockip','blockipopr')) ? 'active' : '' ?>">
                     <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Block Ip\'s'),array('controller' => 'settings','action' => 'blockip'),array('escape'=>false)) ?>
                 </li>
+                <li class="<?php echo in_array($this->action,array('blockas','blockasopr')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Block AS'),array('controller' => 'settings','action' => 'blockas'),array('escape'=>false)) ?>
+                </li>
+            </ul>
+        </li>
+        <li class="treeview <?php echo $this->name == 'Utility' ? 'active' : '' ?>">
+            <a href="#">
+                <i class="fa fa-cogs"></i>
+                <span><?php echo __('Utilities') ?></span>
+                <i class="fa fa-angle-left pull-right"></i>
+            </a>
+            <ul class="treeview-menu">
+                <li class="<?php echo in_array($this->action,array('whois')) ? 'active' : '' ?>">
+                    <?php echo $this->Html->link('<i class="fa fa-angle-double-right"></i>'.__('Whois'),array('controller' => 'utility','action' => 'whois'),array('escape'=>false)) ?>
+                </li>
             </ul>
         </li>
         </ul>

@@ -2,7 +2,7 @@
 class SettingsController extends AppController {
     
     public $components = array('RequestHandler','Common');
-    public $uses = array('Option','Blockip');
+    public $uses = array('Option','Blockip','Blockas');
     public function beforefilter(){
         $this->set('title','Settings');
         $this->set('subtitle','Control panel');
@@ -40,6 +40,52 @@ class SettingsController extends AppController {
         $data = $this->Option->find('first',array('conditions'=>array('key'=>'conditions')));
         if($data){
             $this->request->data['options'] = unserialize($data['Option']['value']);    
+        }
+    }
+    
+    public function blockas() {
+        $condition = $paginate = array();
+        
+        if($this->request->data){
+            if(isset($this->request->data['search']['as']) && $this->request->data['search']['as'] != ''){
+                $condition[] = array('Blockas.as'=>$this->request->data['search']['as']);
+            }
+        }
+        
+        $paginate['conditions'] = $condition;
+        $paginate['fields'] = array('Blockas.*');
+        $paginate['limit'] = Configure::read('limit');
+        $paginate['order'] = array('id' => 'desc'); 
+        
+        $this->paginate = $paginate;
+        $data = $this->paginate('Blockas');
+        $this->set('data',$data);
+    }
+    
+    public function blockasopr() {
+        if($this->request->data){
+            $this->Blockas->set($this->request->data);
+            if ($this->Blockas->validates()) {
+                if($this->Blockas->save($this->request->data)){
+                    $this->Session->setFlash(__('Record successfully saved.'),'success');
+                    $this->redirect(array('controller'=>'settings','action'=>'blockas'));
+                }
+            }
+        }
+        
+        if(isset($_GET['action'])){
+            $opr = _decode($_GET['action']);
+            switch($opr['opr']){
+                case 'delete' :
+                    if($this->Blockas->delete(array('id'=>$opr['id']))){
+                        $this->Session->setFlash(__('Record successfully deleted.'),'success');
+                    }else{
+                        $this->Session->setFlash(__('Record not deleted.'),'error');
+                    }
+                    $this->redirect(array('controller'=>'settings','action'=>'blockas'));
+                    exit;
+                    break;
+            }
         }
     }
     
