@@ -31,6 +31,16 @@ $(function(){
         }
     });
     
+    //Form utility whois form
+    $('#searchWhoisForm').validate({
+        rules : {
+            "data[search][ip]" : {
+                required: true,
+		IP4Checker: true
+            }
+        }
+    });
+    
     //Form blockip search
     $('#searchBlockipForm').validate({
         rules : {
@@ -448,6 +458,24 @@ $(function(){
     });
     $("#searchEnddate").datepicker("option", "minDate", $('#searchStartdate').val());
     
+    
+    /************************ Utility whois form ****************************/
+    $('#searchWhoisForm').submit(function(){
+	$('.loading').html(loader);
+	$('#searchWhoisForm .btn').addClass('disabled');
+	var postData = $('#searchWhoisForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'utility/whoisapi/general',
+	    data: postData, 
+	    success: function(response){
+		$('.loading').html('');
+		$('#searchWhoisForm .btn').removeClass('disabled');
+		$('#whoiscontainer').html(response);
+	    }
+        });
+	return false;
+    });
     
 });
 
