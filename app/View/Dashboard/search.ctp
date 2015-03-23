@@ -110,7 +110,7 @@
                             <td><a href="javascript:void(0)" data-toggle="tooltip" data-original-title="<?php echo $val['Request']['site_referer']?>"><?php echo $sReferer; ?></a></td>
                             <td><?php echo $val['Request']['proxy'] == 1 ? $true : $false ?></td>
                             <td><?php echo $val['Request']['mobile'] == 1 ? $true : $false ?></td>
-                            <td><a data-toggle="tooltip" data-original-title="<?php echo $val['Request']['comments']?>" href="javascript:void(0)"><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></a></td>
+                            <td><a data-toggle="tooltip" data-html="true" data-original-title="<?php echo $val['Request']['comments']?>" href="javascript:void(0)"><?php echo $val['Request']['valid'] == 1 ? $true : $false ?></a></td>
                             <td><?php echo date('d M Y h:i:s A',strtotime($val['Request']['created'])) ?></td>
                         </tr>
                         <?php } ?>
