@@ -32,6 +32,7 @@
                         <tr>
                             <th><?php echo $this->Paginator->sort('name',__('Name')); ?></th>
                             <th><?php echo $this->Paginator->sort('as','Autonomous System Number'); ?></th>
+                            <th>Total Websites</th>
                             <th width="22%">&nbsp;</th>
                         </tr>
                     </thead>
@@ -47,6 +48,7 @@
                         <tr>
                             <td><?php echo $val['Blockas']['name']; ?></td>
                             <td><?php echo $val['Blockas']['as']; ?></td>
+                            <td><?php echo $val[0]['tot']; ?></td>
                             <td>
                                 <?php
                                     echo $this->Html->link('Delete',array('controller'=>'settings','action'=>'blockasopr','?'=>array('action'=>$delete)),array('class'=>'btn btn-danger btn-sm confirm','message'=>'Are you sure to delete'));

@@ -15,10 +15,8 @@
                 <div class="box-body">
                     <div class="row">
                         <div class="form-group col-lg-5">
-                            <?php echo $this->Form->input('name',array('class'=>'form-control','placeholder'=>'Name','label'=>'Name')); ?>
-                        </div>
-                        <div class="form-group col-lg-5">
-                            <?php echo $this->Form->input('as',array('class'=>'form-control','placeholder'=>'Autonomous System Number','label'=>'Autonomous System Number','type'=>'text')); ?>
+                            <?php echo $this->Form->input('domains',array('type' => 'textarea','class'=>'form-control','placeholder'=>'Domain Name','label'=>'Domain name')); ?>
+                            <p class="help-block">Ex: http://www.google.com</p>
                         </div>
                     </div>
                 </div><!-- /.box-body -->
