@@ -2,7 +2,7 @@
 class SettingsController extends AppController {
     
     public $components = array('RequestHandler','Common');
-    public $uses = array('Option','Blockip','Blockas');
+    public $uses = array('Option','Blockip','Blockas','BlockasDomain');
     public function beforefilter(){
         $this->set('title','Settings');
         $this->set('subtitle','Control panel');
@@ -53,7 +53,9 @@ class SettingsController extends AppController {
         }
         
         $paginate['conditions'] = $condition;
-        $paginate['fields'] = array('Blockas.*');
+        $paginate['joins'] = array(array('alias' => 'bad','table' => 'blockas_domains','type' => 'LEFT','conditions' => array('Blockas.as = bad.as')));
+        $paginate['fields'] = array('Blockas.*,SUM(1) as `tot`');
+        $paginate['group'] = array('Blockas.as');
         $paginate['limit'] = Configure::read('limit');
         $paginate['order'] = array('id' => 'desc'); 
         
@@ -66,10 +68,46 @@ class SettingsController extends AppController {
         if($this->request->data){
             $this->Blockas->set($this->request->data);
             if ($this->Blockas->validates()) {
-                if($this->Blockas->save($this->request->data)){
-                    $this->Session->setFlash(__('Record successfully saved.'),'success');
-                    $this->redirect(array('controller'=>'settings','action'=>'blockas'));
+                
+                App::import('Controller', 'getscript');
+                $getscript = new GetscriptController;
+                preg_match_all('/http+[a-z|\/|.|:|0-9|-]+/i',$this->request->data['Blockas']['domains'],$urls);
+                $msg = '';
+                foreach($urls[0] as $key=>$val){
+                    $parseURL = parse_url($val);
+                    if(isset($parseURL['host']) && $parseURL['host'] != ''){
+                        $recordSet = $this->BlockasDomain->find('all',array('conditions'=>array('name'=>$parseURL['host'])));
+                        if($recordSet){
+                            $msg .= sprintf('<li>%s URL already in database.</li>',$parseURL['host']);
+                        }else{
+                            $ip = gethostbyname($parseURL['host']);
+                            if (!filter_var($ip, FILTER_VALIDATE_IP) === false) {
+                                $data = $getscript->get_originAS($ip);
+                                if(isset($data['as']) && $data['as'] != '' && isset($data['as_name']) && $data['as_name'] != ''){
+                                    $blockas = array('id'=>null,'as'=>$data['as'],'name'=>$data['as_name']);
+                                    $blockas_domains = array('id'=>null,'as'=>$data['as'],'name'=>$parseURL['host']);
+                                    
+                                    if($this->BlockasDomain->save($blockas_domains)){
+                                        $msg .= sprintf('<li>%s successfully saved.</li>',$parseURL['host']);
+                                    }
+                                    
+                                    //Save data in blockas
+                                    $tmp = $this->Blockas->find('all',array('conditions'=>array('as'=>$blockas['as'])));
+                                    if(!$tmp){
+                                        if($this->Blockas->save($blockas)){
+                                            $msg .= sprintf('<li>AS%d Origin successfully saved.</li>',$blockas['as']);
+                                        }
+                                    }
+                                }
+                            }else{
+                                $msg .= sprintf('<li class="text-red">%s host IP not found.</li>',$parseURL['host']);
+                            }
+                        }
+                    }else{
+                        $msg .= sprintf('<li class="text-red">%s not valid URL.</li>',$val);
+                    }
                 }
+                $this->Session->setFlash(sprintf('<ul>%s</ul>',$msg),'success');
             }
         }
         

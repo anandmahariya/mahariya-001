@@ -9,6 +9,14 @@ $(function(){
 /********************************************************************************
  * form validation
 ********************************************************************************/    
+    $('#BlockasBlockasoprForm').validate({
+        rules : {
+            "data[Blockas][domains]" : {
+                required: true
+            }
+        }
+    });
+    
     //Form Blocker IP
      $.validator.addMethod('IP4Checker', function(value) {
 	var ip = /^(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])(\.(25[0-5]|2[0-4][0-9]|[0-1][0-9]{2}|[0-9]{2}|[0-9])){3}$/;
@@ -206,10 +214,12 @@ $(function(){
     });
     
     //Hide alert message after some time
+    /*
     $('body').on('DOMNodeInserted', '.alert', function(e) {
         $('.alert').delay(3000).fadeOut('slow');
     });
     $('.alert').delay(3000).fadeOut('slow');
+    */
     
     //Confirm box
     $('.confirm').on('click',function(){
