@@ -2,7 +2,13 @@
     <!-- left column -->
     <div class="col-md-12">
         <!-- general form elements -->
-        <div class="box box-primary">
+        <div class="box box-solid box-primary box-search">
+            <div class="box-header">
+                <h3 class="box-title">Search</h3>
+                <div class="box-tools pull-right">
+                    <button id="collapse" data-toggle="tooltip" data-widget="collapse" class="btn btn-default btn-sm" data-original-title="Collapse"><i class="fa fa-minus"></i></button>
+                </div>
+            </div>
             <!-- form start -->
             <?php echo $this->Form->create('search', array('url' => array('controller' => 'dashboard', 'action' => 'search'))); ?>
                 <div class="box-body">
@@ -155,5 +161,13 @@
     </div>
 </div>
 <script>
-    $("[data-toggle='tooltip']").tooltip();
+    $(function(){
+        <?php if(empty($this->data)) { ?>
+        var box = $(".box-search");
+        var bf = box.find(".box-body, .box-footer");
+        box.addClass("collapsed-box");
+        bf.slideUp();
+        <?php } ?>
+        $("[data-toggle='tooltip']").tooltip();
+    });
 </script>
