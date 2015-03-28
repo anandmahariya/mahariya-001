@@ -255,10 +255,16 @@ $(function(){
 	$('#request-analytics-chart').html(loaderCenter);
 	$('#request-analytics-chart-vip').html(loaderCenter);
 	$('#request-analytics-chart-city').html(loaderCenter);
+	$('#request-analytics-chart-referer').html(loaderCenter);
+	$('#request-analytics-chart-os').html(loaderCenter);
 	renderAnalyticsReqChart();
 	renderAnalyticsReqChart_Vip();
 	renderAnalyticsCityChart();
+	renderAnalyticsRefererChart();
+	renderAnalyticsOSChart();
     }
+    
+    
     
     function renderAnalyticsReqChart_Vip(){
 	var postData = $('#analyticsAnalyticsForm').serialize();
@@ -318,6 +324,39 @@ $(function(){
 			    parseTime : false,
 			    hideHover: 'auto'
 			});
+	    }
+        });
+    }
+    
+    function renderAnalyticsRefererChart(){
+	var postData = $('#analyticsAnalyticsForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/analytic_unique_request_chart',
+	    data: postData, 
+	    success: function(response){
+		$('#request-analytics-chart-referer').html(response);
+		$(".knob").knob();
+	    }
+        });
+    }
+    
+    function renderAnalyticsOSChart(){
+	var postData = $('#analyticsAnalyticsForm').serialize();
+	$.ajax({
+	    type: "POST",
+	    url: base_url + 'dashboard/renderchart/analytic_os_chart',
+	    data: postData, 
+	    success: function(response){
+		var data = $.parseJSON(response);
+		$('#request-analytics-chart-os').html('');
+		var donut = new Morris.Donut({
+		    element: 'request-analytics-chart-os',
+		    resize: true,
+		    colors: data.color,
+		    data: data.data,
+		    hideHover: 'auto'
+		});
 	    }
         });
     }
