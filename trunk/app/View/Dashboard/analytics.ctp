@@ -25,8 +25,8 @@
                                 </div>
                                 <div id="request-analytics-chart" class="box-body chart-responsive" style="height: 270px;"></div><!-- /.box-body -->
                             </div><!-- /.box -->
-                            
                         </div><!-- /.col (LEFT) -->
+			
                         <div class="col-md-6">
                             <!-- AREA CHART -->
                             <div class="box box-primary">
@@ -35,12 +35,29 @@
                                 </div>
                                 <div id="request-analytics-chart-vip" class="box-body chart-responsive" style="height: 300px;"></div><!-- /.box-body -->
                             </div><!-- /.box -->
-
-                            <!-- DONUT CHART -->
-                            
-                            
                         </div><!-- /.col (LEFT) -->
-                        <div class="col-md-6">
+			
+			<div class="col-md-6">
+                            <!-- AREA CHART -->
+                            <div class="box box-primary">
+                                <div class="box-header">
+                                    <h3 class="box-title">Operating System</h3>
+                                </div>
+                                <div id="request-analytics-chart-os" class="box-body chart-responsive" style="height: 300px;"></div><!-- /.box-body -->
+                            </div><!-- /.box -->
+                        </div><!-- /.col (LEFT) -->
+			
+			<div class="col-md-12">
+                            <!-- AREA CHART -->
+                            <div class="box box-primary">
+                                <div class="box-header">
+                                    <h3 class="box-title">Unique Request</h3>
+                                </div>
+                                <div id="request-analytics-chart-referer" class="box-body chart-responsive" style="height: 200px;"></div>
+                            </div><!-- /.box -->
+                        </div><!-- /.col (LEFT) -->
+			
+                        <div class="col-md-12">
                             <!-- LINE CHART -->
                             <div class="box box-warning">
                                 <div class="box-header">
@@ -48,9 +65,6 @@
                                 </div>
                                 <div id="request-analytics-chart-city" class="box-body table-responsive"></div><!-- /.box-body -->
                             </div><!-- /.box -->
-
-                            
-
                         </div><!-- /.col (RIGHT) -->
                         
                     </div>

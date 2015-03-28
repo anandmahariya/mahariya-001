@@ -134,6 +134,83 @@ class DashboardController extends AppController {
                 $result['labels'] = array('total','valid','in-valid','proxy');
                 $result['data'] = array_values($sites);
                 break;
+            case 'analytic_os_chart' : //operating system chart
+                $post = $_POST['data']['analytics'];
+                $date_s = $this->Common->mysqlDate($post['date'],'dd/mm/yy','start');
+                $date_e = $this->Common->mysqlDate($post['date'],'dd/mm/yy','end');
+                
+                $conditions = '';
+                $sites = array();
+                if($post['site'] != ''){
+                    $conditions .= ' and r.site_id = '.$post['site'];
+                }
+                
+                $query = sprintf('SELECT 
+                                    r.user_agent
+                                    FROM `requests` r
+                                    where r.created between "%s" and "%s" %s ',$date_s,$date_e,$conditions);
+                
+                $dataset = $this->Request->query($query);
+                
+                $data = array();
+                foreach($dataset as $key=>$val){
+                    $tmp = $this->Common->getBrowserOS($val['r']['user_agent']);
+                    $preCount = isset($data[$tmp['os_platform']][$tmp['browser']]) ? $data[$tmp['os_platform']][$tmp['browser']] : 0 ;
+                    $data[$tmp['os_platform']][$tmp['browser']] = $preCount + 1;
+                }
+                
+                $tmp = array();
+                foreach($data as $key=>$val){
+                    $tmp[$key] = array('label'=>$key,'value'=>array_sum($val));
+                }
+                
+                $result['color'] = $this->Common->randColor(count($tmp));
+                $result['data'] = array_values($tmp);
+                break;
+            case 'analytic_unique_request_chart' : //operating system chart
+                $post = $_POST['data']['analytics'];
+                $date_s = $this->Common->mysqlDate($post['date'],'dd/mm/yy','start');
+                $date_e = $this->Common->mysqlDate($post['date'],'dd/mm/yy','end');
+                
+                $conditions = '';
+                $sites = array();
+                if($post['site'] != ''){
+                    $conditions .= ' and r.site_id = '.$post['site'];
+                }
+                
+                $query = sprintf('SELECT 
+                                    *
+                                    FROM `requests` r
+                                    where r.created between "%s" and "%s" %s ',$date_s,$date_e,$conditions);
+                
+                $dataset = $this->Request->query($query);
+                
+                $result = array();
+                $result['Total Request'] = array('color'=>'#00a65a','value'=>count($dataset),'max'=>count($dataset));
+                $tmpValid = 0;
+                
+                $data = array();
+                foreach($dataset as $key=>$val){
+                    $data[$val['r']['ip']][] = $val['r'];
+                    if($val['r']['valid'] ==1){
+                        $tmpValid += 1;
+                    }
+                }
+                
+                $result['Unique Request'] = array('color'=>'#932ab6','value'=>count($data),'max'=>count($dataset));
+                $result['Valid Unique Request'] = array('color'=>'Blue','value'=>$tmpValid,'max'=>count($data));
+                $result['Invalid Unique Request'] = array('color'=>'Red','value'=>count($data) - $tmpValid,'max'=>count($data));
+                
+                $output = '';
+                foreach($result as $key=>$val){
+                    $output .= sprintf('<div class="col-md-3 col-sm-6 col-xs-6 text-center">
+                                    <input type="text" class="knob" data-max="%d" value="%d"  data-readOnly="true" data-width="90" data-height="90" data-fgColor="%s"/>
+                                    <div class="knob-label">%s</div>
+                                </div>',$val['max'],$val['value'],$val['color'],$key);
+                }
+                echo $output;
+                exit;
+                break;
             case 'request' :
                     $post = $_POST['data']['request'];
                     $totalDays = date('t',mktime(0,0,0,$post['month'],1,$post['year']));
