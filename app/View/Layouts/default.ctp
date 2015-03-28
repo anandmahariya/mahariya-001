@@ -100,6 +100,8 @@
 	<!-- bootbox script -->
 	<script src="<?php echo Router::url('/', true); ?>js/plugins/morris/raphael-min.js" type="text/javascript"></script>
 	<script src="<?php echo Router::url('/', true); ?>js/plugins/morris/morris.min.js" type="text/javascript"></script>
+	<!-- jQuery Knob -->
+        <script src="<?php echo Router::url('/', true); ?>/js/plugins/jqueryKnob/jquery.knob.js" type="text/javascript"></script>
 	<!-- common script -->
 	<script src="<?php echo Router::url('/', true); ?>js/common.js" type="text/javascript"></script>
     </body>
