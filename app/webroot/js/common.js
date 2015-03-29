@@ -255,12 +255,12 @@ $(function(){
 	$('#request-analytics-chart').html(loaderCenter);
 	$('#request-analytics-chart-vip').html(loaderCenter);
 	$('#request-analytics-chart-city').html(loaderCenter);
-	$('#request-analytics-chart-referer').html(loaderCenter);
+	$('#analytics-unique-request-chart').html(loaderCenter);
 	$('#request-analytics-chart-os').html(loaderCenter);
 	renderAnalyticsReqChart();
 	renderAnalyticsReqChart_Vip();
 	renderAnalyticsCityChart();
-	renderAnalyticsRefererChart();
+	renderAnalyticsUniqueRequestChart();
 	renderAnalyticsOSChart();
     }
     
@@ -328,14 +328,14 @@ $(function(){
         });
     }
     
-    function renderAnalyticsRefererChart(){
+    function renderAnalyticsUniqueRequestChart(){
 	var postData = $('#analyticsAnalyticsForm').serialize();
 	$.ajax({
 	    type: "POST",
 	    url: base_url + 'dashboard/renderchart/analytic_unique_request_chart',
 	    data: postData, 
 	    success: function(response){
-		$('#request-analytics-chart-referer').html(response);
+		$('#analytics-unique-request-chart').html(response);
 		$(".knob").knob();
 	    }
         });

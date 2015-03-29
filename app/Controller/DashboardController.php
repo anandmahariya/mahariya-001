@@ -178,16 +178,14 @@ class DashboardController extends AppController {
                     $conditions .= ' and r.site_id = '.$post['site'];
                 }
                 
-                $query = sprintf('SELECT 
-                                    *
-                                    FROM `requests` r
+                $query = sprintf('SELECT *  FROM `requests` r
                                     where r.created between "%s" and "%s" %s ',$date_s,$date_e,$conditions);
                 
                 $dataset = $this->Request->query($query);
                 
                 $result = array();
-                $result['Total Request'] = array('color'=>'#00a65a','value'=>count($dataset),'max'=>count($dataset));
-                $tmpValid = 0;
+                //$result['Total Request'] = array('color'=>'#00a65a','value'=>count($dataset),'max'=>count($dataset));
+                $tmpValid = $googleReferer = 0;
                 
                 $data = array();
                 foreach($dataset as $key=>$val){
@@ -195,9 +193,13 @@ class DashboardController extends AppController {
                     if($val['r']['valid'] ==1){
                         $tmpValid += 1;
                     }
+                    if(strpos($val['r']['site_referer'],'google.com/aclk') !== false){
+                        $googleReferer += 1;
+                    }
                 }
                 
-                $result['Unique Request'] = array('color'=>'#932ab6','value'=>count($data),'max'=>count($dataset));
+                $result['Unique Request'] = array('color'=>'#00a65a','value'=>count($data),'max'=>count($dataset));
+                $result['Google Referer Request'] = array('color'=>'#932ab6','value'=>$googleReferer,'max'=>count($data));
                 $result['Valid Unique Request'] = array('color'=>'Blue','value'=>$tmpValid,'max'=>count($data));
                 $result['Invalid Unique Request'] = array('color'=>'Red','value'=>count($data) - $tmpValid,'max'=>count($data));
                 
