@@ -53,7 +53,7 @@
                                 <div class="box-header">
                                     <h3 class="box-title">Unique Request</h3>
                                 </div>
-                                <div id="request-analytics-chart-referer" class="box-body chart-responsive" style="height: 200px;"></div>
+                                <div id="analytics-unique-request-chart" class="box-body chart-responsive" style="height: 200px;"></div>
                             </div><!-- /.box -->
                         </div><!-- /.col (LEFT) -->
 			
