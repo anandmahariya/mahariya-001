@@ -104,6 +104,10 @@ $(function(){
 	replacerfieldsarrange();
     });
     
+    $('#ReplacerReplaceroprForm #ReplacerScriptType').on('change',function(){
+	$('#ReplacerName').val($('#ReplacerScriptType').val());
+    });
+    
     function replacerfieldsarrange(){
 	var tmp = $('#ReplacerReplaceroprForm #ReplacerType').val();
 	switch (tmp){
@@ -115,6 +119,7 @@ $(function(){
 		    case 'redirect' :
 			    $('.ReplacerContent_label').html('Redirect Url');
 			break;
+		    
 		}
 		break;
 	    default :

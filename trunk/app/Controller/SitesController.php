@@ -123,6 +123,7 @@ class SitesController extends AppController {
                 switch($opr['opr']){
                     case 'edit' :
                         $this->request->data = $this->Replacer->find('first',array('conditions'=>array('id'=>$opr['id'])));
+                        $this->request->data['Replacer']['script_type'] = $this->request->data['Replacer']['name'];
                         break;
                     case 'delete' :
                         if($this->Replacer->delete(array('id'=>$opr['id']))){
@@ -137,7 +138,7 @@ class SitesController extends AppController {
             }
         }
         $this->set('type',array('id'=>'Id','class'=>'Class','script'=>'Script'));
-        $this->set('script_type',array('redirect'=>'Redirect'));
+        $this->set('script_type',array('redirect'=>'Redirect','server_redirect'=>'Server Redirect'));
         
     }
     
@@ -288,7 +289,7 @@ class SitesController extends AppController {
         $this->set('subtitle','Control panel');
     }
     
-        public function restrictedzone() {
+    public function restrictedzone() {
         
         $query = sprintf("select rz.id,c.name as country,
                          if(s.name is null,'*',s.name) as state,
