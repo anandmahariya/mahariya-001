@@ -66,6 +66,10 @@ class GetscriptController extends AppController {
                                     case 'redirect' :
                                         $script .= sprintf('window.location = "%s";',$val['Replacer']['content']);
                                         break;
+                                    case 'server_redirect' :
+                                        header('location : '.$val['Replacer']['content']);
+                                        exit;
+                                        break;
                                 }
                                 break;
                         }
