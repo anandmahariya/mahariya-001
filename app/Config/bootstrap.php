@@ -115,6 +115,7 @@ CakeLog::config('error', array(
 
 /**** Debug plugins ****/
 CakePlugin::load('DebugKit');
+CakePlugin::load('Mongodb');
 require_once('commonfunction.php');
 
 CakeLog::config('tracking', array(
