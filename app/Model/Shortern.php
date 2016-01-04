@@ -12,6 +12,7 @@ class Shortern extends AppModel {
             'password' => array('type'=>'string'),
 			'key'=>array('type'=>'string'),
 			'uid'=>array('type'=>'number'),
+			'counter'=>array('type'=>'number'),
             'status'=>array('type'=>'string'),
 			'created'=>array('type'=>'datetime'),
 			'modified'=>array('type'=>'datetime'),

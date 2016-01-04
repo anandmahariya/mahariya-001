@@ -90,14 +90,14 @@
                                     <td><?php echo $val['Shortern']['alias'] != '' ? $val['Shortern']['alias'] : $false; ?></td>
 
                                     <td><?php echo $val['Shortern']['password'] != '' ? $true : $false; ?></td>
-                                    <td><?php echo rand(1,100000); ?></td>
+                                    <td><?php echo isset($val['Shortern']['counter']) ? $val['Shortern']['counter'] : 0; ?></td>
                                     <?php
                                     echo sprintf('<td><a href="javascript:void(0)" id="%d" value="%d" type="site" class="changestatus">%s</a></td>',
-                                       $val['Shortern']['_id'],
-                                       $val['Shortern']['status'],
-                                       $val['Shortern']['status'] != 1 ? $false : $true );
-                                       ?>
-                                       <td>
+                                     $val['Shortern']['_id'],
+                                     $val['Shortern']['status'],
+                                     $val['Shortern']['status'] != 1 ? $false : $true );
+                                     ?>
+                                     <td>
                                         <?php
                                         echo $this->Html->link('Edit',array('controller'=>'shortern','action'=>'shorternopr','?'=>array('action'=>$edit)),array('class'=>'btn btn-info btn-sm')); 
                                         echo '&nbsp;';

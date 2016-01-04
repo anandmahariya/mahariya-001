@@ -2,7 +2,7 @@
 class ShorternController extends AppController {
 
 	public $uses = array('Domain','Request','Shortern','Ip');
-    var $components = array('RequestHandler');
+    var $components = array('RequestHandler','Common');
     
     public function beforeFilter(){
         //$tmp = $this->Ip->getIpLocation('66.249.90.91');
@@ -28,7 +28,7 @@ class ShorternController extends AppController {
         }
 
         $paginate['conditions'] = $condition;
-        $paginate['fields'] = array('url','alias','redirect','password','key','domain','status');
+        $paginate['fields'] = array('url','alias','redirect','password','key','domain','status','counter');
         $paginate['limit'] = Configure::read('limit');
         $paginate['order'] = array('_id' => 'desc'); 
         
