@@ -17,7 +17,16 @@ class ApiController extends AppController {
 	create shortern : cs
 	check shortern alias : csa
 	*/
+    public function i(){
+        $response = array();
+        $response['domain'] = $this->Domain->find('list');
+        $response['redirect'] = array('direct'=>'direct','frame'=>'frame','splash'=>'splash');
 
+        $this->autoRender = false;
+        $this->response->type('json');
+        
+        echo json_encode($response);
+    }
 
 
 	public function s($key=null) {
@@ -42,8 +51,10 @@ class ApiController extends AppController {
              'sys_msg'=>'Key not match'));
         }          
 
+        $this->autoRender = false;
+        $this->response->type('json');
+        
         echo json_encode($response);
-        exit; 
     }
 
     function cs(){
@@ -65,8 +76,10 @@ class ApiController extends AppController {
                     $data['uid'] = 0;
                     $data['status'] = 1;
                     if($this->Shortern->save($data)){
+                        
+                        $domains = $this->Domain->find('list');
                         $response = array('error'=>0,
-                                      'data'=>$data,
+                                      'data'=>array('key'=>$data['key'],'ckey'=> 'http://'.$domains[$data['domain']].'/'.$data['key']),
                                       'display_msg'=>'Record successfully saved.',
                                       'sys_msg'=>'Record successfully saved');
                     }
@@ -82,8 +95,10 @@ class ApiController extends AppController {
                                       'sys_msg'=>$tmp);
             }
         }
-        echo json_encode($response);
-        exit;
-    }
 
+        $this->autoRender = false;
+        $this->response->type('json');
+        
+        echo json_encode($response);
+    }
 }
