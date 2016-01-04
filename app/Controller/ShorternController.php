@@ -164,8 +164,4 @@ class ShorternController extends AppController {
             }
         }
     }
-
-    public function genkey($url){
-        return substr(hash('crc32b',$url),0,6);
-    }
 }
