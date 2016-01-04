@@ -31,7 +31,7 @@ class ApiController extends AppController {
 
 	public function s($key=null) {
 		$response = array();
-        $params = array('fields' => array('_id'=>0),'conditions' => array('key' => $key));
+        $params = array('fields' => array(),'conditions' => array('key' => $key));
         $resultSet = $this->Shortern->find('first',$params);
         if($resultSet){
 
@@ -45,6 +45,11 @@ class ApiController extends AppController {
                  )
                 )
             );
+
+            //increase counter by 1
+            $resultSet['Shortern']['counter'] = isset($resultSet['Shortern']['counter']) ? $resultSet['Shortern']['counter'] + 1 : 1; 
+            $this->Shortern->save($resultSet);
+            
         }else{
         	$response = array('response'=>array('error'=>1,
              'disp_msg'=>'Key not match',
@@ -63,11 +68,14 @@ class ApiController extends AppController {
             $this->Shortern->set($this->request->data);
             if ($this->Shortern->validates() == true) {
                 $data = $this->request->data;
-                $params = array('fields' => array('url'),'conditions' => array('url' => $data['url']));
+                $domains = $this->Domain->find('list');
+                        
+                $params = array('fields' => array('url','domain','key'),'conditions' => array('url' => $data['url']));
                 $resultSet = $this->Shortern->find('first',$params);
                 if($resultSet){
+                    $tmp = 'http://'.$domains[$resultSet['Shortern']['domain']].'/'.$resultSet['Shortern']['key'];
                     $response = array('error'=>1,
-                                      'display_msg'=>'Url already short.',
+                                      'display_msg'=> sprintf('Url already short. <a href="%s" target="_blank">%s</a>',$tmp,$tmp),
                                       'sys_msg'=>'Url already short');
                 }else{
                     $data['alias'] = isset($data['alias']) && $data['alias'] != '' ? $data['alias'] : ''; 
@@ -76,8 +84,6 @@ class ApiController extends AppController {
                     $data['uid'] = 0;
                     $data['status'] = 1;
                     if($this->Shortern->save($data)){
-                        
-                        $domains = $this->Domain->find('list');
                         $response = array('error'=>0,
                                       'data'=>array('key'=>$data['key'],'ckey'=> 'http://'.$domains[$data['domain']].'/'.$data['key']),
                                       'display_msg'=>'Record successfully saved.',
