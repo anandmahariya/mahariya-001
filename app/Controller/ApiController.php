@@ -1,7 +1,8 @@
 <?php
 class ApiController extends AppController {
 
-	public $uses = array('Domain','Request','Shortern','Ip');
+	var $uses = array('Domain','Request','Shortern','Ip');
+    var $components = array('RequestHandler','Common');
 
 	public function beforeFilter() {
         parent::beforeFilter();
@@ -16,24 +17,73 @@ class ApiController extends AppController {
 	create shortern : cs
 	check shortern alias : csa
 	*/
+
+
+
 	public function s($key=null) {
 		$response = array();
         $params = array('fields' => array('_id'=>0),'conditions' => array('key' => $key));
         $resultSet = $this->Shortern->find('first',$params);
         if($resultSet){
 
-            $response = array('url'=>$resultSet['Shortern']['url'],
-         						'status'=>$resultSet['Shortern']['status'],
-         						'redirect'=>$resultSet['Shortern']['redirect'],
-         						'user'=>array('valid'=>1,
-         										'popup_url'=>'http://www.jabong.com'));
+            $response = array('response'=>array(
+                'error'=>0,
+                'url'=>$resultSet['Shortern']['url'],
+                'status'=>$resultSet['Shortern']['status'],
+                'redirect'=>$resultSet['Shortern']['redirect'],
+                'user'=>array('valid'=>1,
+                 'popup_url'=>'http://www.jabong.com'
+                 )
+                )
+            );
         }else{
         	$response = array('response'=>array('error'=>1,
-        					  'disp_msg'=>'Key not match',
-        					  'sys_msg'=>'Key not match'));
+             'disp_msg'=>'Key not match',
+             'sys_msg'=>'Key not match'));
         }          
 
         echo json_encode($response);
         exit; 
-	}
+    }
+
+    function cs(){
+        $response = array();
+        if($this->request->data){
+            $this->Shortern->set($this->request->data);
+            if ($this->Shortern->validates() == true) {
+                $data = $this->request->data;
+                $params = array('fields' => array('url'),'conditions' => array('url' => $data['url']));
+                $resultSet = $this->Shortern->find('first',$params);
+                if($resultSet){
+                    $response = array('error'=>1,
+                                      'display_msg'=>'Url already short.',
+                                      'sys_msg'=>'Url already short');
+                }else{
+                    $data['alias'] = isset($data['alias']) && $data['alias'] != '' ? $data['alias'] : ''; 
+                    $data['password'] = isset($data['password']) && $data['password'] != '' ? $data['password'] : ''; 
+                    $data['key'] = $this->Common->genkey($data['url']);
+                    $data['uid'] = 0;
+                    $data['status'] = 1;
+                    if($this->Shortern->save($data)){
+                        $response = array('error'=>0,
+                                      'data'=>$data,
+                                      'display_msg'=>'Record successfully saved.',
+                                      'sys_msg'=>'Record successfully saved');
+                    }
+                }
+            }else{
+                $tmp = '<ul>';
+                foreach ($this->Shortern->validationErrors as $key => $value) {
+                    $tmp .= sprintf('<li>%s</li>',$value[0]);
+                }
+                $tmp .= '</ul>';
+                $response = array('error'=>1,
+                                      'display_msg'=>'data not validate',
+                                      'sys_msg'=>$tmp);
+            }
+        }
+        echo json_encode($response);
+        exit;
+    }
+
 }

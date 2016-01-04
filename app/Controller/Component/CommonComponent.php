@@ -288,5 +288,9 @@ class CommonComponent extends Component {
             'os_platform'   =>  $os_platform
         );
     }
+
+    function genkey($url){
+        return substr(hash('crc32b',$url),0,6);
+    }
     
 }
