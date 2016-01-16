@@ -5,9 +5,7 @@ class ShorternController extends AppController {
     var $components = array('RequestHandler','Common');
     
     public function beforeFilter(){
-        //$tmp = $this->Ip->getIpLocation('66.249.90.91');
-        //echo '<pre>';print_r($tmp);echo '</pre>';
-        //exit;
+        
     }
 
     public function index() {
