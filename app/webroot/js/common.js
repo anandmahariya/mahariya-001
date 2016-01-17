@@ -533,38 +533,23 @@ $(function(){
     
     /********************** Analytic panal JS ****************************/
     if ($("body").data("title") === "Analytics-request") {
+		
+		$('#analyticsRequestForm .refresh-btn').on('click',function(e){
+			e.preventDefault();
+			renderAnalyticsAllCharts();
+		});
+		renderAnalyticsAllCharts();
+    }
+
+    function renderAnalyticsAllCharts(){
+		//reset all charts
 		$('#request-analytics-chart-hour-wise').html(loaderCenter);
 		$('#request-analytics-chart-vip').html(loaderCenter);
 		$('#request-analytics-chart-os').html(loaderCenter);
 		$('#request-analytics-unique-request-chart').html(loaderCenter);
 		$('#request-analytics-chart-location').html(loaderCenter);
 		
-		renderAnalyticsAllCharts();
-
-		
-		/*
-		$('#requestIndexForm select').on('change',function(){
-		    renderReqChart();
-		});
-		renderReqChart();
-		
-		$('#topip-chart').html(loaderCenter);
-		renderTopIp();
-		
-		renderClickData();
-		renderStateChart();
-		
-		setInterval(function(){
-		    renderReqChart();
-		    renderTopIp();
-		    renderClickData();
-		    renderStateChart();
-		}, 20000);
-		*/
-    }
-
-    function renderAnalyticsAllCharts(){
-		renderAnalyticRequestChart();
+		//Paint all charts
 		renderAnalyticRequestChart();
 	}
 
