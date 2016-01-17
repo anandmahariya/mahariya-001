@@ -13,7 +13,7 @@
                 </div>
                 <div class="row">   
                     <div class="form-group col-lg-4">
-                        <?php echo $this->Form->input('alias',array('class'=>'form-control','placeholder'=>'Alias','label'=>__('Alias'))); ?>
+                        <?php echo $this->Form->input('alias',array('class'=>'form-control','placeholder'=>'Alias / Key','label'=>__('Alias / Key'))); ?>
                     </div>
                     <div class="form-group col-lg-4">
                         <?php echo $this->Form->input('redirect',array('class'=>'form-control','empty'=>'Select','options'=>$redirect)); ?>
@@ -57,10 +57,9 @@
                     <thead>
                         <tr>
                             <th><?php echo $this->Paginator->sort('url',__('Url')); ?></th>
-                            <th><?php echo $this->Paginator->sort('key',__('Key')); ?></th>
+                            <th><?php echo $this->Paginator->sort('key',__('Key / Alias')); ?></th>
                             <th><?php echo $this->Paginator->sort('domain',__('Domain')); ?></th>
                             <th><?php echo $this->Paginator->sort('redirect',__('Redirct')); ?></th>
-                            <th><?php echo $this->Paginator->sort('alias',__('Alias')); ?></th>
                             <th><?php echo $this->Paginator->sort('password',__('Password')); ?></th>
                             <th>Total Hits</th>
                             <th><?php echo $this->Paginator->sort('status','Status'); ?></th>
@@ -80,15 +79,13 @@
                                 $detail = _encode(array('id'=>$val['Shortern']['_id']));
                                 $edit = _encode(array('id'=>$val['Shortern']['_id'],'opr'=>'edit'));
                                 $delete = _encode(array('id'=>$val['Shortern']['_id'],'opr'=>'delete'));
-                                $reset = _encode(array('id'=>$val['Shortern']['_id'],'opr'=>'reset'));
+                                $viewAnalytics = _encode(array('key'=>$val['Shortern']['key'],'opr'=>'view'));
                                 ?>
                                 <tr>
                                     <td><?php echo $title; ?></td>
                                     <td><?php echo $val['Shortern']['key']; ?></td>
-                                    <td><?php echo $val['Shortern']['domain'] != '' ? $domains[$val['Shortern']['domain']] : '--'; ?></td>
+                                    <td><?php echo $val['Shortern']['domain'] != '' ? sprintf('<a href="%s" target="_blank">%s</a>','http://'.$domains[$val['Shortern']['domain']].'/'.$val['Shortern']['key'],$domains[$val['Shortern']['domain']]) : '--'; ?></td>
                                     <td><?php echo $val['Shortern']['redirect'] != '' ? $val['Shortern']['redirect'] : $false; ?></td>
-                                    <td><?php echo $val['Shortern']['alias'] != '' ? $val['Shortern']['alias'] : $false; ?></td>
-
                                     <td><?php echo $val['Shortern']['password'] != '' ? $true : $false; ?></td>
                                     <td><?php echo isset($val['Shortern']['counter']) ? $val['Shortern']['counter'] : 0; ?></td>
                                     <?php
@@ -103,7 +100,7 @@
                                         echo '&nbsp;';
                                         echo $this->Html->link('Delete',array('controller'=>'shortern','action'=>'shorternopr','?'=>array('action'=>$delete)),array('class'=>'btn btn-danger btn-sm confirm','message'=>'Are you sure to delete'));
                                         echo '&nbsp;';
-                                        echo $this->Html->link('View Analytics',array('controller'=>'shortern','action'=>'shorternopr','?'=>array('action'=>$reset)),array('class'=>'btn btn-warning btn-sm'));
+                                        echo $this->Html->link('View Analytics',array('controller'=>'analytics','action'=>'request','?'=>array('action'=>$viewAnalytics)),array('class'=>'btn btn-warning btn-sm'));
                                         ?>
                                     </td>
                                 </tr>
