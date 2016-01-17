@@ -11,7 +11,7 @@
                     <?php echo $this->Form->input('date',array('class'=>'form-control','empty'=>false,'value'=>date('d/m/Y'),'label'=>false)); ?>
                 </div>
                 <div class="pull-right box-tools">
-                    <?php echo $this->Form->input('alias',array('class'=>'form-control','value'=>$this->data['analytics']['key'],'label'=>false)); ?>
+                    <?php echo $this->Form->input('alias',array('class'=>'form-control','value'=>$this->data['analytics']['key'],'label'=>false,'readonly'=>true)); ?>
 		        </div>
             </div>
             <?php echo $this->Form->end(); ?>

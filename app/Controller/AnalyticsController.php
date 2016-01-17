@@ -52,7 +52,6 @@ class AnalyticsController extends AppController {
 	//Render chart : Analytic chart with key and date
 	private function renderchart_key_request_chart_hour_wise($alias,$date){
 		$response = array();
-		$date = '16/01/2016';
 		$datetime = strtotime($this->Common->mysqlDate($date,'dd/mm/yy'));
 		$sdate = mktime(0,0,0,date('m',$datetime),date('d',$datetime),date('Y',$datetime));
 		$edate = mktime(23,59,59,date('m',$datetime),date('d',$datetime),date('Y',$datetime));
