@@ -531,6 +531,68 @@ $(function(){
 	return false;
     });
     
+    /********************** Analytic panal JS ****************************/
+    if ($("body").data("title") === "Analytics-request") {
+		$('#request-analytics-chart-hour-wise').html(loaderCenter);
+		$('#request-analytics-chart-vip').html(loaderCenter);
+		$('#request-analytics-chart-os').html(loaderCenter);
+		$('#request-analytics-unique-request-chart').html(loaderCenter);
+		$('#request-analytics-chart-location').html(loaderCenter);
+		
+		renderAnalyticsAllCharts();
+
+		
+		/*
+		$('#requestIndexForm select').on('change',function(){
+		    renderReqChart();
+		});
+		renderReqChart();
+		
+		$('#topip-chart').html(loaderCenter);
+		renderTopIp();
+		
+		renderClickData();
+		renderStateChart();
+		
+		setInterval(function(){
+		    renderReqChart();
+		    renderTopIp();
+		    renderClickData();
+		    renderStateChart();
+		}, 20000);
+		*/
+    }
+
+    function renderAnalyticsAllCharts(){
+		renderAnalyticRequestChart();
+		renderAnalyticRequestChart();
+	}
+
+	//first chart request on hours wise
+	function renderAnalyticRequestChart(){
+		var postData = $('#analyticsRequestForm').serialize();
+		$.ajax({
+		    type: "POST",
+		    url: base_url + 'analytics/renderchart/key_request_chart_hour_wise',
+		    data: postData, 
+		    success: function(response){
+			var data = $.parseJSON(response);
+			$('#request-analytics-chart-hour-wise').html('');
+			var line = new Morris.Line({
+				    element: 'request-analytics-chart-hour-wise',
+				    resize: true,
+				    data:  data.data,
+				    xkey: 'y',
+				    ykeys: ['Request'],
+				    labels: ['Request'],
+				    lineColors: data.color,
+				    xLabelAngle : 35,
+				    parseTime : false,
+				    hideHover: 'auto'
+				});
+		    }
+        });
+	}
 });
 
     
