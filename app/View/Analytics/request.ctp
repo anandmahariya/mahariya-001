@@ -3,16 +3,17 @@
         <div class="box box-info">
             <?php echo $this->Form->create('analytics'); ?>
             <div class="box-header">
-                <h3 class="box-title">Shorten Analytics</h3>
+                <h3 class="box-title">Alias : <?php echo $this->data['analytics']['key']; ?></h3>
                 <div class="pull-right box-tools">
                     <button title="" data-toggle="tooltip" class="btn btn-danger btn-sm refresh-btn" data-original-title="Reload"><i class="fa fa-refresh"></i></button>
                 </div>
                 <div class="pull-right box-tools">
-                    <?php echo $this->Form->input('date',array('class'=>'form-control','empty'=>false,'value'=>date('d/m/Y'),'label'=>false)); ?>
+                    <?php echo $this->Form->hidden('alias',array('value'=>$this->data['analytics']['key'])); ?>
+                    <?php echo $this->Form->input('edate',array('class'=>'form-control','empty'=>false,'value'=>date('d/m/Y'),'label'=>false)); ?>
                 </div>
                 <div class="pull-right box-tools">
-                    <?php echo $this->Form->input('alias',array('class'=>'form-control','value'=>$this->data['analytics']['key'],'label'=>false,'readonly'=>true)); ?>
-		        </div>
+                    <?php echo $this->Form->input('sdate',array('class'=>'form-control','empty'=>false,'value'=>date('d/m/Y'),'label'=>false)); ?>
+                </div>
             </div>
             <?php echo $this->Form->end(); ?>
             <div class="box-body chart-responsive">

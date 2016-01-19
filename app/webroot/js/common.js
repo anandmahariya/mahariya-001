@@ -534,6 +534,25 @@ $(function(){
     /********************** Analytic panal JS ****************************/
     if ($("body").data("title") === "Analytics-request") {
 		
+		//date picker
+		$('#analyticsRequestForm #analyticsSdate').datepicker({
+	        numberOfMonths: 1,
+		changeMonth: true,
+		changeYear: true,
+	        dateFormat: 'dd/mm/yy',
+	        onSelect: function(selected) {
+	            $("#analyticsRequestForm #analyticsEdate").datepicker("option", "minDate", selected)
+	        }
+	    });
+	    
+	    $('#analyticsRequestForm #analyticsEdate').datepicker({
+	        numberOfMonths: 1,
+		changeMonth: true,
+		changeYear: true,
+	        dateFormat: 'dd/mm/yy'
+	    });
+	    $("#analyticsRequestForm #analyticsEdate").datepicker("option", "minDate", $('#analyticsRequestForm #analyticsSdate').val());
+
 		$('#analyticsRequestForm .refresh-btn').on('click',function(e){
 			e.preventDefault();
 			renderAnalyticsAllCharts();
@@ -561,20 +580,14 @@ $(function(){
 		    url: base_url + 'analytics/renderchart/key_request_chart_hour_wise',
 		    data: postData, 
 		    success: function(response){
-			var data = $.parseJSON(response);
-			$('#request-analytics-chart-hour-wise').html('');
-			var line = new Morris.Line({
-				    element: 'request-analytics-chart-hour-wise',
-				    resize: true,
-				    data:  data.data,
-				    xkey: 'y',
-				    ykeys: ['Request'],
-				    labels: ['Request'],
-				    lineColors: data.color,
-				    xLabelAngle : 35,
-				    parseTime : false,
-				    hideHover: 'auto'
-				});
+				$('#request-analytics-chart-hour-wise').html('');
+				$('#request-analytics-chart-location').html('');
+
+				var data = $.parseJSON(response);
+				var line = new Morris.Line(data.chart1);
+
+				//location 
+				$('#request-analytics-chart-location').html(data.location);
 		    }
         });
 	}
