@@ -123,7 +123,7 @@ class AnalyticsController extends AppController {
         	if(isset($location[$country][$state][$city])){
         		$location[$country][$state][$city] += 1;
         	}else{
-        		$location[$country][$state][$city] = 0;
+        		$location[$country][$state][$city] = 1;
         	}
         } 
 
@@ -133,7 +133,10 @@ class AnalyticsController extends AppController {
         	foreach($val1 as $state=>$val2){
         		foreach($val2 as $city=>$val3){
             			$total += $val3;
-            $table .= sprintf('<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td></tr>',$country,
+            			$color = $country == "United States" ? ' bgcolor="yellow" ' : '';
+            			$table .= sprintf('<tr %s><td>%s</td><td>%s</td><td>%s</td><td>%d</td></tr>',
+            					$color,
+            					$country,
                                 $state,
                                 $city,$val3);
         }}}
